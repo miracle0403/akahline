@@ -1,0 +1,112 @@
+{{> spageh}}
+{{#if errors}}
+  {{#each errors}}
+  <div class="alert alert-danger">
+    {{this.msg}}
+  </div>
+  {{/each}}
+{{/if}}
+
+{{#if error}}
+  <div class="alert alert-danger">
+    {{error}}
+  </div>
+    {{/if}}
+  {{#if success}}
+  {{> message}}
+    {{/if}}
+<div class="col-md-12">
+ <div class="card">
+   <div class="header">
+   <br>
+     <h4 class="title">{{title}}</h4>
+       </div>
+         <form method ="POST" action ="/register">
+		 <div class="content">
+           <div class="row">
+             <div class="col-md-12">
+			 <div class="form-group">
+    <label for="fullname">Full Name</label>
+    <input type="text" class="form-control" 
+id="fullname" name ="fullname" placeholder="Enter Full Name" required />
+    </div>
+	</div>
+	<div class="content">
+           <div class="row">
+             <div class="col-md-12">
+			 <div class="form-group">
+    <label for="sponsor">Sponsor</label>
+    <input type="text" class="form-control" 
+id="sponsor" name ="sponsor" value="{{sponsor}}" required/>
+</div>
+	</div>
+	<div class="content">
+           <div class="row">
+             <div class="col-md-12">
+			 <div class="form-group">
+    <label for="username">username</label>
+    <input type="text" class="form-control" 
+id="username" name ="username" placeholder="Enter username" required />
+</div>
+	</div>
+	<div class="content">
+           <div class="row">
+             <div class="col-md-12">
+			 <div class="form-group">
+    <label for="Email">Email address</label>
+    <input type="email" class="form-control" id="Email" aria-describedby="emailHelp" name ="email" placeholder="Enter email" required />
+    <small id="emailHelp" class="form-text text-muted">We'll 
+never share your email with anyone else.</small>
+</div>
+	</div>
+	<div class="content">
+           <div class="row">
+             <div class="col-md-12">
+			 <div class="form-group">
+    <label for="countrycode">Country Code</label>
+  <select name="code" class="form-control" value="Select Country Code" id="code">
+    <option></option>
+      <option>+234</option>
+  </select>
+</div>
+	</div>
+	<div class="content">
+           <div class="row">
+             <div class="col-md-12">
+			 <div class="form-group">
+    <label for="phone">Phone Number</label>
+  <input type="tel" class="form-control" 
+id="phone" name ="phone" placeholder="e.g 8012345678" value="" required />
+</div>
+	</div>
+	<div class="content">
+           <div class="row">
+             <div class="col-md-12">
+			 <div class="form-group">
+    <label for="Pass1">Password</label>
+    <input type="password" class="form-control" 
+id="Pass1" name ="pass1" placeholder="Password" required />
+</div>
+	</div>
+	<div class="content">
+           <div class="row">
+             <div class="col-md-12">
+			 <div class="form-group">
+    <label for="Pass2">Confirm Password</label>
+    <input type="password" class="form-control" 
+id="Pass2" name ="pass2" placeholder="Password" required />
+</div>
+	</div>
+	<div class="content">
+           <div class="row">
+             <div class="col-md-12">
+			 <div class="form-check">
+    <input type="checkbox" class="form-check-input" 
+id="exampleCheck1" required/>
+    <label class="form-check-label" 
+for="exampleCheck1">I agree to the term and contition <a href="terms" target="_blank">here</a> </label>
+</div>
+	</div>
+
+<div class="form-group"> <button type="submit" class="btn btn-primary">Submit</button> </form>
+{{> spagef}}
