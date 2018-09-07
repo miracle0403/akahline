@@ -12,7 +12,7 @@ var mysql = require('mysql');
 var hbs = require('hbs');
 var fs = require('fs');
 
-
+console.log(process.env.NODE_ENV)
 //Authentication packages
 var bcrypt = require('bcrypt-nodejs');
 var securePin = require('secure-pin');

@@ -2,6 +2,7 @@
 const nodemailer = require('nodemailer');
 //var resete = require('../nodemailer/passwordreset.js');
 var verify = require('../nodemailer/verification.js');
+//var matrix = require('../functions/withsponsor.js');
 var timer = require( '../functions/datefunctions.js' );
 var express = require('express');
 var passport = require('passport'); 
@@ -17,7 +18,7 @@ var bcrypt = require('bcrypt-nodejs');
 function rounds( err, results ){
 	if ( err ) throw err;
 }
-const saltRounds = bcrypt.genSalt( 15, rounds);
+const saltRounds = bcrypt.genSalt( 10, rounds);
 
 function restrict( ){
 	db.query( 'SELECT user_id FROM admin WHERE user_id  = ?', [currentUser], function ( err, results, fields ){ 
@@ -369,6 +370,8 @@ router.post('/register', function(req, res, next) {
   req.checkBody('code', 'Country Code must not be empty.').notEmpty();
   req.checkBody('pass1', 'Password must match').equals(req.body.pass2);
   req.checkBody('phone', 'Phone Number must be ten characters').len(10);
+  req.checkBody('pin', 'Pin must be thirteen characters').len(13);
+  req.checkBody('serial', 'Serial must be ten characters').len(10);
   //req.checkBody('pass1', 'Password must have upper case, lower case, symbol, and number').matches(/*(?=,*\d)(?=, *[a-z])(?=, *[A-Z])(?!, [^a-zA-Z0-9]).{8,}$/, "i")
  
   var errors = req.validationErrors();
@@ -387,6 +390,8 @@ router.post('/register', function(req, res, next) {
     var code = req.body.code;
     var phone = req.body.phone;
 	var sponsor = req.body.sponsor;
+	var pin = req.body.pin;
+	var serial = req.body.serial;
 
     var db = require('../db.js');
     
@@ -397,9 +402,9 @@ router.post('/register', function(req, res, next) {
     exports.password = password;
     exports.code = code;
     exports.email  = email;
-    exports.username = username;*/
+    exports.username = username;
     
-    //check if sponsor is valid
+   check if sponsor is valid
     db.query('SELECT username, full_name, email FROM user WHERE username = ?', [sponsor], function(err, results, fields){
       if (err) throw err;
       if(results.length===0){
@@ -411,7 +416,7 @@ router.post('/register', function(req, res, next) {
 		  var sponmail ={
 			email: results[0].email,
 			name: results[0].full_name
-		  } 
+		  }   */
         db.query('SELECT username FROM user WHERE username = ?', [username], function(err, results, fields){
           if (err) throw err;
           if(results.length===1){
@@ -428,26 +433,101 @@ router.post('/register', function(req, res, next) {
                 //req.flash( 'error', error)
                 res.render('register', {title: "REGISTRATION FAILED", error: error});
               }else{
-              	
-              		 bcrypt.hash(password, saltRounds, null, function(err, hash){
-                  db.query('CALL register(?, ?, ?, ?, ?, ?, ?, ?, ?)', [sponsor, fullname, phone, code, username, email, hash, 'active', 'no'], function(err, result, fields){
-                    if (err) throw err;
-                    
-                    		var veri = require( '../functions/mailfunctions.js' );
-					   		//veri.sendverify(username);
-					   			var success  = 'Your registration was successful';
-                    		console.log(hash);
-                   		 	console.log(results); 
-                    		res.render('register', {title: 'SUCCESS', success: success});                   	            	  
-              		
-              		});
-              	});
+					//check if the serial exists	
+					db.query('SELECT * FROM pin WHERE serial = ?', [serial], function(err, results, fields){
+   		 				if (err) throw err;
+    					if(results.length === 0){
+      					var error = 'serial does not exist';
+      res.render('register', {error: error, title: 'REGISTRATION UNSUCCESSCUL!'})
+    				}else{
+    					const hash = results[0].pin;
+    					//compare the pin
+    					bcrypt.compare(pin, hash, function(err, response){
+        					if(response === false){
+          					var error = 'the pin does not exist';
+          					res.render('register', {title: 'REGISTRATION UNSUSSESSFUL!', error: error})
+          				}
+          				else{
+          					var user_pin = results[0].user;
+          					console.log('user in the pin is' + user_pin);
+          //make sure no one has used the pin before
+          					if(user_pin !== null){
+            						var error = 'pin has been  used already!'
+            						res.render('register', {title: 'REGISTRATION UNSUSSESSFUL!', error: error});
+            					}else{
+            						 //check if the user has joined the matrix before now
+         					 		db.query('SELECT user FROM pin WHERE user = ?', [username], function(err, results, fields){
+           		 					if (err) throw err;
+           		 					if(results.length  >= 1){
+           		 					var error = "Sorry, You cannot Join the Matrix because you are already in the matrix";
+           		 					res.render('register', {title: 'REGISTRATION UNSUSSESSFUL!', error: error});
+           		 					}else{
+           		 						//update the pin
+              							db.query('UPDATE pin SET user = ? WHERE serial = ?', [username, serial], function(err, results,fields){
+                							if (err) throw err;
+                						console.log(results);
+                							//check if the sponsor is valid
+                							db.query('SELECT username, full_name, email FROM user WHERE username = ?', [sponsor], function(err, results, fields){
+      										if (err) throw err;
+      										if (results.length===0){
+      											var error = "Your sponsor does not exist in our database";
+      											res.render('register', {error: error, title: 'REGISTRATION UNSUCCESSCUL!'})
+      										}
+      										else{
+      											//hash password and insert user in the database
+      												bcrypt.hash(password, saltRounds, null, function(err, hash){
+                  								db.query( 'CALL register(?, ?, ?, ?, ?, ?, ?, ?, ?)', [sponsor, fullname, phone, code, username, email, hash, 'active', 'no'], function(err, result, fields){
+                    							if (err) throw err;
+                    							// get the other function
+                    									db.query('CALL feedercall(?)', [username], function(err, results, fields){
+		for(var i = 0; i < results.length; i++){
+			var user = results[i].user;
+			console.log(results);
+			db.query('SELECT * FROM feeder_tree WHERE user = ?', [user], function(err, results, fields){
+				if (err) throw err;
+				if (results.length === 1){
+					var first = {
+			  			a: results[0].a,
+			  			b: results[0].b,
+			  			c: results[0].c,
+			  			d: results[0].d
+					}
+					//if a is null
+						if(first.a === null && first.b === null && first.c === null && first.d === null){
+			 //update into the sponsor set
+			  				db.query('UPDATE feeder_tree SET a = ? WHERE user = ?', [username, user], function(err, results, fields){
+								if(err) throw err;
+				//call the procedure for adding
+								db.query('CALL leafadd(?,?,?)', [sponsor, user, username], function(err, results, fields){
+				  					if (err) throw err;
+									res.render('join', {title: 'Successful Entrance'});
+									});
+			 					 });
+								}	
+								
+			  	 			 }
+						});
+						}
+					});
+                    							
+              									});
+              								});
+      										}
+      										});
+                						  });
+           		 					}
+           		 				});
+            					}
+          				}
+          			});
+    				}
+    			  });
               }
             });
           }
         });
-      }
-    });
+      //}
+    //});
   }
 });
 //Passport login
@@ -565,75 +645,5 @@ router.post('/profile', function(req, res, next) {
   }
 });
 
-// post join
-router.post('/join',  function (req, res, next) {
-  var pin = req.body.pin;
-  var serial = req.body.serial;
-  var currentUser = req.session.passport.user.user_id;
-  console.log(req.body);
-  //console.log(currentUser)
 
-  //get the particular serial and pin from the database
-  db.query('SELECT * FROM pin WHERE serial = ?', [serial], function(err, results, fields){
-    if (err) throw err;
-    if(results.length === 0){
-      var error = 'serial does not exist';
-      res.render('join', {title: 'MATRIX UNSUCCESSCUL!'})
-    }else{
-      const hash = results[0].pin;
-      bcrypt.compare(pin, hash, function(err, response){
-        if(response === false){
-          var error = 'the pin does not exist';
-          res.render('join', {title: 'MATRIX ENTRANCE UNSUSSESSFUL!', error: error})
-        }else{
-          var user_pin = results[0].user_id;
-          console.log('user in the pin is' + user_pin);
-          //make sure no one has used the pin before
-          if(user_pin !== null){
-            var error = 'pin has been  used already!'
-            res.render('join', {title: 'MATRIX ENTRANCE UNSUSSESSFUL!', error: error});
-          }else{
-          //check if the user has joined the matrix before now
-          db.query('SELECT user_id FROM pin WHERE user_id = ?', [currentUser], function(err, results, fields){
-            if (err) throw err;
-			//now for the normal matrix
-            if(results.length === 0){
-              //update the pin
-              db.query('UPDATE pin SET user_id = ? WHERE serial = ?', [currentUser, serial], function(err, results,fields){
-                if (err) throw err;
-                console.log(results);
-                //select sponsor from user
-                db.query('SELECT sponsor FROM user WHERE user_id = ?', [currentUser], function(err, results, fields){
-                  if (err) throw err;
-                  var sponsor = results[0].sponsor;
-                  console.log('sponsor name is:' + sponsor);
-                  //get the sponsor id
-                  db.query('SELECT user_id FROM user WHERE username = ?', [sponsor], function(err, results, fields){
-                    if (err) throw err;
-                    var id = results[0].user_id;
-                    console.log('sponsor id is ' + id);
-                       //select sponsor of the sponsor
-					db.query('SELECT sponsor FROM user WHERE user_id = ?', [id], function(err, results, fields){
-					  if (err) throw err;
-					  var sponsorer = results[0].sponsor;
-					  console.log('sponsor name is:' + sponsorer);
-					  //get the sponsor id
-					  db.query('SELECT user_id FROM user WHERE username = ?', [sponsorer], function(err, results, fields){
-						if (err) throw err;
-						var sponid = results[0].user_id;
-						console.log('sponsor id is ' + sponid);
-						  matrix.withspon(id, currentUser)
-                      });
-                    });
-                  });
-                });
-              });
-            }
-          });
-		  }  
-        }
-      });
-    }
-  });
-});
 module.exports = router;
