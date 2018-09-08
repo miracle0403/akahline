@@ -10,12 +10,13 @@ var securePin = require('secure-pin');
 var charSet = new securePin.CharSet();
 charSet.addLowerCaseAlpha().addUpperCaseAlpha().addNumeric().randomize();
 var router = express.Router();
+var mysql = require( 'mysql2' );
 var db = require('../db.js');
-var expressValidator = require('express-validator');
+var expressValidator = require('express-validator'); 
 var  matrix = require('../functions/withsponsor.js');
 
 var bcrypt = require('bcrypt-nodejs');
-function rounds( err, results ){
+function rounds( err, results ){ 
 	if ( err ) throw err;
 }
 const saltRounds = bcrypt.genSalt( 10, rounds);
@@ -28,6 +29,15 @@ function restrict( ){
 		}
 	});
 }
+
+var pool  = mysql.createPool({
+  connectionLimit : 100,
+  multipleStatements: true,
+  waitForConnections: true,
+  host: "localhost",
+  user: "root",
+  database: "new"
+});
 
 /* GET home page. */
 router.get('/', function(req, res, next) {
@@ -417,7 +427,10 @@ router.post('/register', function(req, res, next) {
 			email: results[0].email,
 			name: results[0].full_name
 		  }   */
-        db.query('SELECT username FROM user WHERE username = ?', [username], function(err, results, fields){
+		  pool.getConnection(function(err, connection) {
+
+  if (err) throw err;
+connection.query('SELECT username FROM user WHERE username = ?', [username], function(err, results, fields){
           if (err) throw err;
           if(results.length===1){
             var error = "Sorry, this username is taken";
@@ -425,7 +438,7 @@ router.post('/register', function(req, res, next) {
            // req.flash( 'error', error)
             res.render('register', {title: "REGISTRATION FAILED", error: error});
           }else{
-            db.query('SELECT email FROM user WHERE email = ?', [email], function(err, results, fields){ 
+            connection.query('SELECT email FROM user WHERE email = ?', [email], function(err, results, fields){ 
               if (err) throw err;
               if(results.length===1){ 
                 var error = "Sorry, this email is taken";
@@ -434,7 +447,7 @@ router.post('/register', function(req, res, next) {
                 res.render('register', {title: "REGISTRATION FAILED", error: error});
               }else{
 					//check if the serial exists	
-					db.query('SELECT * FROM pin WHERE serial = ?', [serial], function(err, results, fields){
+					connection.query('SELECT * FROM pin WHERE serial = ?', [serial], function(err, results, fields){
    		 				if (err) throw err;
     					if(results.length === 0){
       					var error = 'serial does not exist';
@@ -456,18 +469,18 @@ router.post('/register', function(req, res, next) {
             						res.render('register', {title: 'REGISTRATION UNSUSSESSFUL!', error: error});
             					}else{
             						 //check if the user has joined the matrix before now
-         					 		db.query('SELECT user FROM pin WHERE user = ?', [username], function(err, results, fields){
+         					 		connection.query('SELECT user FROM pin WHERE user = ?', [username], function(err, results, fields){
            		 					if (err) throw err;
            		 					if(results.length  >= 1){
            		 					var error = "Sorry, You cannot Join the Matrix because you are already in the matrix";
            		 					res.render('register', {title: 'REGISTRATION UNSUSSESSFUL!', error: error});
            		 					}else{
            		 						//update the pin
-              							db.query('UPDATE pin SET user = ? WHERE serial = ?', [username, serial], function(err, results,fields){
+              							connection.query('UPDATE pin SET user = ? WHERE serial = ?', [username, serial], function(err, results,fields){
                 							if (err) throw err;
-                						console.log(results);
+                						//console.log(results);
                 							//check if the sponsor is valid
-                							db.query('SELECT username, full_name, email FROM user WHERE username = ?', [sponsor], function(err, results, fields){
+                							connection.query('SELECT username, full_name, email FROM user WHERE username = ?', [sponsor], function(err, results, fields){
       										if (err) throw err;
       										if (results.length===0){
       											var error = "Your sponsor does not exist in our database";
@@ -476,38 +489,69 @@ router.post('/register', function(req, res, next) {
       										else{
       											//hash password and insert user in the database
       												bcrypt.hash(password, saltRounds, null, function(err, hash){
-                  								db.query( 'CALL register(?, ?, ?, ?, ?, ?, ?, ?, ?)', [sponsor, fullname, phone, code, username, email, hash, 'active', 'no'], function(err, result, fields){
+                  								connection.query( 'CALL register(?, ?, ?, ?, ?, ?, ?, ?, ?)', [sponsor, fullname, phone, code, username, email, hash, 'active', 'no'], function(err, result, fields){
                     							if (err) throw err;
+                    							//console.log( results )
                     							// get the other function
-                    									db.query('CALL feedercall(?)', [username], function(err, results, fields){
-		for(var i = 0; i < results.length; i++){
-			var user = results[i].user;
-			console.log(results);
-			db.query('SELECT * FROM feeder_tree WHERE user = ?', [user], function(err, results, fields){
-				if (err) throw err;
-				if (results.length === 1){
-					var first = {
-			  			a: results[0].a,
-			  			b: results[0].b,
-			  			c: results[0].c,
-			  			d: results[0].d
-					}
-					//if a is null
-						if(first.a === null && first.b === null && first.c === null && first.d === null){
+                    									connection.query('SELECT parent.user FROM user_tree AS node, user_tree AS parent WHERE node.lft BETWEEN parent.lft AND parent.rgt AND node.user = ? AND parent.feeder is not null ORDER BY parent.lft', [username], function(err, results, fields){
+                    									if( err ) throw err;
+                    								for( var i  = 0; i < results.length; i++ ){
+                    									var user = results[i].user;
+                    									console.log( user );
+                    									//now, i have gotten the user, its time to fix the new user.
+                    						connection.query ('SELECT * FROM feeder_tree WHERE user = ?', [user], function(err, results, fields){
+												if (err) throw err;
+												if (results.length === 1){
+													var first = {
+			  											a: results[0].a,
+			  											b: results[0].b,
+			  											c: results[0].c,
+			  											d: results[0].d
+													  }
+													  //if a is null
+			if(first.a === null && first.b === null && first.c === null && first.d === null){
 			 //update into the sponsor set
-			  				db.query('UPDATE feeder_tree SET a = ? WHERE user = ?', [username, user], function(err, results, fields){
-								if(err) throw err;
+			  connection.query('UPDATE feeder_tree SET a = ? WHERE user = ?', [username, user], function(err, results, fields){
+				if(err) throw err;
 				//call the procedure for adding
-								db.query('CALL leafadd(?,?,?)', [sponsor, user, username], function(err, results, fields){
-				  					if (err) throw err;
-									res.render('join', {title: 'Successful Entrance'});
-									});
-			 					 });
-								}	
-								
-			  	 			 }
-						});
-						}
+				connection.query('CALL leafadd(?,?,?)', [sponsor, user, username], function(err, results, fields){
+				  if (err) throw err;
+					res.render('register', {title: 'Successful Entrance'});
+				});
+			  });
+			}	
+			//if b is null
+			if(first.a !== null && first.b === null && first.c === null && first.d === null){
+			 //update into the sponsor set
+			  connection.query('UPDATE feeder_tree SET b = ? WHERE user = ?', [username, user], function(err, results, fields){
+				if(err) throw err;
+				//call the procedure for adding
+				connection.query('CALL leafadd(?,?,?)', [sponsor, user, username], function(err, results, fields){
+				  if (err) throw err;
+					res.render('register', {title: 'Successful Entrance'});
+				});
+			  });
+			}
+			//if c is null
+			if(first.a !== null && first.b !== null && first.c === null && first.d === null){
+			 //update into the sponsor set
+			  connection.query('UPDATE feeder_tree SET c = ? WHERE user = ?', [username, user], function(err, results, fields){
+				if(err) throw err;
+				//call the procedure for adding
+				connection.query('CALL leafadd(?,?,?)', [sponsor, user, username], function(err, results, fields){
+				  if (err) throw err;
+					res.render('register', {title: 'Successful Entrance'});
+				});
+			  });
+			}
+													}
+												});
+                    								}
+                    									connection.release( );
+                    							res.render( 'register' )		
+                    							
+                    									//loop to get the last person
+                    								           								
 					});
                     							
               									});
@@ -526,6 +570,9 @@ router.post('/register', function(req, res, next) {
             });
           }
         });
+	
+});
+        
       //}
     //});
   }
@@ -550,7 +597,7 @@ function pin(){
       console.log(str);
 	  var pinn = 'AGS' + pin;
       bcrypt.hash(pinn, saltRounds, null, function(err, hash){
-        db.query('INSERT INTO pin (pin, serial) VALUES (?, ?)', [hash, str], function(error, results, fields){
+        pool.query('INSERT INTO pin (pin, serial) VALUES (?, ?)', [hash, str], function(error, results, fields){
           if (error) throw error;
           //console.log(results)
         });

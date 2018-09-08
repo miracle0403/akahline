@@ -1,6 +1,7 @@
 'use strict'; 
 var env  = require('dotenv').config();
 const nodemailer = require('nodemailer');
+//const Sequelize = require('sequelize');
 var createError = require('http-errors');
 var express = require('express');
 var path = require('path');
@@ -8,7 +9,8 @@ var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 var bodyParser = require('body-parser');
 var expressValidator = require('express-validator');
-var mysql = require('mysql');
+var mysql = require('mysql2');
+var myConnection = require('express-myconnection'); // express-myconnection module 
 var hbs = require('hbs');
 var fs = require('fs');
 
@@ -65,10 +67,14 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
 var options = {
+  waitForConnections: true,
+  connectionLimit : 100,
   host: "localhost",
-  user: "root", 
+  user: "root",
   database: "new"
 };
+
+app.use(myConnection(mysql, options, 'pool')); 
 
 var sessionStore = new MySQLStore(options);
   

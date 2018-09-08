@@ -1,17 +1,27 @@
-var mysql = require ('mysql');
+var mysql = require ('mysql2');
 var server = require ('./app.js');
 
-connection = mysql.createConnection({
+var pool  = mysql.createPool({
+  multipleStatements: true,
+  connectionLimit : 100,
+  waitForConnections: true,
   host: "localhost",
   user: "root",
   database: "new"
 });
 
-connection.connect()
-
-connection.query('SELECT 1 + 1 AS solution', function (error, results, fields){
-  if (error) throw error;
-  console.log ("the result is: results[0], solution")
+pool.getConnection( function ( err, con ){
+	if ( err ){
+		console.log( 'no connection to pool' )
+	}
+	else{
+		con.query( 'SELECT username FROM user', function ( err, results, fields ){
+			if ( err ) throw err;
+			else{
+			console.log( 'the result is ' + results[0].username);
+			pool.releaseConnection( con );
+			}
+		});
+	}
 });
-  
-module.exports = connection
+module.exports = pool;

@@ -2,13 +2,8 @@
 drop procedure leafadd
 
 // add the amount in feeders completion
-DELIMITER //
-CREATE PROCEDURE feederAmount (usere INT(11))
-BEGIN
-INSERT INTO earnings (user, amount) VALUES (usere, 6000);
-
-END //
-DELIMITER ;
+							
+							
 
 //get into the stage 1
 DELIMITER //

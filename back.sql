@@ -1,3 +1,11 @@
+DELIMITER //
+CREATE PROCEDURE feederAmount (user VARCHAR(255))
+BEGIN
+INSERT INTO earnings (user, amount) VALUES (user, 6000);
+
+END //
+DELIMITER ;
+
 CREATE TABLE pin( user VARCHAR(255) UNIQUE, serial text NOT NULL, pin varchar( 255 ) NOT NULL, date DATETIME)	;
 
 CREATE TABLE `feeder_tree` (
@@ -20,6 +28,13 @@ CREATE TABLE `feeder` (
 	`rgt` INT(11) NOT NULL
 );
 
+CREATE TABLE `stage1` (
+	`user` VARCHAR(255)NOT NULL,
+	`amount` INT(11) NOT NULL,
+	`lft` INT(11) NOT NULL,
+	`rgt` INT(11) NOT NULL
+);
+
 DELIMITER //
 CREATE PROCEDURE leafadd(sponsor VARCHAR(255), mother VARCHAR(255), child VARCHAR(255))
 BEGIN
@@ -30,18 +45,19 @@ INSERT INTO feeder_tree (sponsor, user) VALUES (sponsor, child);
 UPDATE feeder SET rgt = rgt + 2 WHERE rgt > @myLeft;
 UPDATE feeder SET lft = lft + 2 WHERE lft > @myLeft;
 UPDATE feeder SET amount = amount + 1 WHERE user = mother;
+UPDATE user_tree SET feeder = 'yes' WHERE user = child;
 
 INSERT INTO feeder(user, lft, rgt, amount) VALUES(child, @myLeft + 1, @myLeft + 2, 0);
 
 END //
 DELIMITER ;
 
-
+drop procedure feedercall;
 DELIMITER //
 CREATE PROCEDURE feedercall (user VARCHAR(255))
 BEGIN
 
-SELECT parent.user FROM feeder AS node, user_tree AS parent WHERE node.lft BETWEEN parent.lft AND parent.rgt AND node.user_id = user ORDER BY parent.lft;
+SELECT parent.user FROM user_tree AS node, user_tree AS parent WHERE node.lft BETWEEN parent.lft AND parent.rgt AND node.user = user AND parent.feeder is not null ORDER BY parent.lft;
 
 END //
 DELIMITER ;
@@ -79,10 +95,30 @@ ENGINE=InnoDB
 ;
 
 DELIMITER //
-CREATE PROCEDURE `register`( sponsor TEXT, fullname VARCHAR( 255 ), phone VARCHAR( 255 ), code INT( 11 ), username VARCHAR( 255 ), email VARCHAR ( 255 ), password VARCHAR( 255 ), status VARCHAR( 255 ), verification TEXT)                                  BEGIN
+CREATE PROCEDURE `register`( sponsor TEXT, full_name VARCHAR( 255 ), phone VARCHAR( 255 ), code INT( 11 ), username VARCHAR( 255 ), email VARCHAR ( 255 ), password VARCHAR( 255 ), status VARCHAR( 255 ), verification TEXT)                                 
+ BEGIN
 
-INSERT INTO user (sponsor, full_name, phone, code, username, email, password, status, verification) VALUES ( sponsor, fullname, phone,code, username, email, password, 'active', 'no');
+SELECT @myLeft := lft FROM user_tree WHERE user = sponsor;
+
+UPDATE user_tree SET rgt = rgt + 2 WHERE rgt > @myLeft;
+
+UPDATE user_tree SET lft = lft + 2 WHERE lft > @myLeft;
+
+INSERT INTO user_tree(user, rgt, lft) VALUES(username, @myLeft + 2, @myLeft + 1);
+
+INSERT INTO user (sponsor, full_name, phone, code, username, email, password, status, verification) VALUES ( sponsor, full_name, phone,code, username, email, password, 'active', 'no');
 
 END//
 DELIMITER ;
 
+CREATE TABLE `user_tree` (
+	`user` VARCHAR(255) NOT NULL,
+	`lft` INT(11) NOT NULL,
+	`rgt` INT(11) NOT NULL,
+	`feeder` VARCHAR(255)  NULL,
+	`stage1` VARCHAR(255)  NULL,
+	`stage2` VARCHAR(255)  NULL,
+	`stage3` VARCHAR(255)  NULL,
+	`stage4` VARCHAR(255)  NULL
+	
+);
