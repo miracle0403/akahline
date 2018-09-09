@@ -14,7 +14,8 @@ var router = express.Router();
 var mysql = require( 'mysql' );
 var db = require('../db.js');
 var expressValidator = require('express-validator'); 
-var  matrix = require('../functions/withsponsor.js');
+var  matrix = require('../functions/normal.js');
+
 
 var bcrypt = require('bcrypt-nodejs');
 function rounds( err, results ){ 
@@ -290,124 +291,55 @@ router.get('/logout', function(req, res, next) {
 
 //get dashboard
 router.get('/dashboard', authentificationMiddleware(), function(req, res, next) {
-pinset( );
+//pinset( );
   var db = require('../db.js');
   var currentUser = req.session.passport.user.user_id;
-  
-  		pool.query( 'SELECT username FROM user WHERE user_id = ?', [currentUser], function ( err, results, fields ){
-  		if( err ) throw err;
-  		var username = results[0].username;
-  		//check if the user has updated his profile
-  		
-  		pool.query( 'SELECT user FROM profile WHERE user = ?', [username], function ( err, results, fields ){
-  			if( err ) throw err;
-  			if( results.length === 0 ){
-  				var error = 'Please update your profile to see your stats.';
-  				res.render( 'dashboard', {title: 'DASHBOARD', error: error});
-  			}
-  			else{
-  			pool.query( 'SELECT feeder, stage1, stage2, stage3, stage4 FROM user WHERE user = ?', [username], function ( err, results, fields ){
-  			if( err ) throw err;
-  			var stage = {
+  db.query( 'SELECT username FROM user WHERE user_id = ?', [currentUser], function ( err, results, fields ){
+  	if( err ) throw err;
+  	var username = results[0].username;
+ 	//check if the user has updated his profile
+	db.query( 'SELECT user FROM profile WHERE user = ?', [username], function ( err, results, fields ){
+		if( err ) throw err;
+  		if( results.length === 0 ){
+  			var error = 'Please update your profile to see your stats.';
+  			res.render( 'dashboard', {title: 'DASHBOARD', error: error});
+  		}
+		else{
+			db.query( 'SELECT feeder, stage1, stage2, stage3, stage4 FROM user_tree WHERE user = ?', [username], function ( err, results, fields ){
+				if( err ) throw err;
+				var stage = {
   				feeder: results[0].feeder,
   				stage1: results[0].stage1,
   				stage2: results[0].stage2,
   				stage3: results[0].stage3,
   				stage4: results[0].stage4
-  			}
-  			if( stage.feeder !== null  && stage.stage1 === null){
-  			var currentstage = 'Feeder Stage';
-  			if( stage.stage1 !== null  && stage.stage2 === null){
-  			var currentstage = ' Stage One';
-  			if( stage.stage2 !==  null && stage.stage3 === null){
-  			var currentstage = ' Stage Two';
-  			if( stage.stage3 !== null  && stage.stage4 === null){
-  			var currentstage = ' Stage Three';
-  			if( stage.stage4 !== null){
-  			var currentstage = ' Stage Four';
-  			pool.query('SELECT node.user,   (COUNT(parent.user) - (sub_tree.depth + 1)) AS depth FROM feeder AS node, feeder AS parent, feeder AS sub_parent, ( SELECT node.user, (COUNT(parent.user) - 1) AS depth FROM feeder AS node, feeder AS parent WHERE node.lft BETWEEN parent.lft AND parent.rgt AND node.user = ? GROUP BY node.user ORDER BY node.lft) AS sub_tree WHERE node.lft BETWEEN parent.lft AND parent.rgt AND node.lft BETWEEN sub_parent.lft AND sub_parent.rgt AND sub_parent.user  =  sub_tree.user GROUP BY node.user HAVING depth = ? ORDER BY depth ', [username, 1], function(err, results, fields){
-												if (err) throw err; 
-	
-	var feeder = results;
-	console.log( feeder );
-	
-	pool.query('SELECT node.user,   (COUNT(parent.user) - (sub_tree.depth + 1)) AS depth FROM stage1 AS node, stage1 AS parent, stage1 AS sub_parent, ( SELECT node.user, (COUNT(parent.user) - 1) AS depth FROM stage1 AS node, stage1 AS parent WHERE node.lft BETWEEN parent.lft AND parent.rgt AND node.user = ? GROUP BY node.user ORDER BY node.lft) AS sub_tree WHERE node.lft BETWEEN parent.lft AND parent.rgt AND node.lft BETWEEN sub_parent.lft AND sub_parent.rgt AND sub_parent.user  =  sub_tree.user GROUP BY node.user HAVING depth  < ? ORDER BY depth', [username, 3], function(err, results, fields){
-												if (err) throw err; 
-	
-	var stage1 = results;
-	console.log( stage1 );
-	pool.query('SELECT node.user,   (COUNT(parent.user) - (sub_tree.depth + 1)) AS depth FROM stage2 AS node, stage2 AS parent, stage2 AS sub_parent, ( SELECT node.user, (COUNT(parent.user) - 1) AS depth FROM stage2 AS node, stage2 AS parent WHERE node.lft BETWEEN parent.lft AND parent.rgt AND node.user = ? GROUP BY node.user ORDER BY node.lft) AS sub_tree WHERE node.lft BETWEEN parent.lft AND parent.rgt AND node.lft BETWEEN sub_parent.lft AND sub_parent.rgt AND sub_parent.user  =  sub_tree.user GROUP BY node.user HAVING depth   = ? ORDER BY depth', [username, 4], function(err, results, fields){
-												if (err) throw err; 
-	
-	var stage2 = results;
-	pool.query('SELECT node.user,   (COUNT(parent.user) - (sub_tree.depth + 1)) AS depth FROM stage3 AS node, stage3 AS parent, stage3 AS sub_parent, ( SELECT node.user, (COUNT(parent.user) - 1) AS depth FROM stage3 AS node, stage3 AS parent WHERE node.lft BETWEEN parent.lft AND parent.rgt AND node.user = ? GROUP BY node.user ORDER BY node.lft) AS sub_tree WHERE node.lft BETWEEN parent.lft AND parent.rgt AND node.lft BETWEEN sub_parent.lft AND sub_parent.rgt AND sub_parent.user  =  sub_tree.user GROUP BY node.user HAVING depth   =  ? ORDER BY depth', [username, 1], function(err, results, fields){
-												if (err) throw err; 
-	
-	var stage3 = results;
-	pool.query('SELECT node.user,   (COUNT(parent.user) - (sub_tree.depth + 1)) AS depth FROM stage4 AS node, stage4 AS parent, stage4 AS sub_parent, ( SELECT node.user, (COUNT(parent.user) - 1) AS depth FROM stage4 AS node, stage4 AS parent WHERE node.lft BETWEEN parent.lft AND parent.rgt AND node.user = ? GROUP BY node.user ORDER BY node.lft) AS sub_tree WHERE node.lft BETWEEN parent.lft AND parent.rgt AND node.lft BETWEEN sub_parent.lft AND sub_parent.rgt AND sub_parent.user  =  sub_tree.user GROUP BY node.user HAVING depth   =  ? ORDER BY depth', [username, 1], function(err, results, fields){
-												if (err) throw err; 
-	
-	var stage4 = results;
-			//get the earnings
-  				pool.query( 'SELECT * FROM earnings WHERE user= ?', [username], function ( err, results, fields ){
-  					if( err ) throw err;
-  					if( results.length === 0 ){
-  						var earnings = {
-  							feeder: 0,
-  							stage1: 0,
-  							stage2: 0,
-  							stage3: 0,
-  							stage4: 0,
-  							powerbank: 0,
-  							phone: 0,
-  							laptop: 0,
-  							leadership: 0,
-  							empower: 0,
-  							salary: 0,
-                              car: 0
-  						}
-  						var cash = 0;
-  						var gift = 0;
-  						var total = cash + gift;
-  					var error = 'You have not earned yet.'
-  						res.render( 'dashboard', {title: 'USER DASHBOARD', stage: currentstage, feedertree: feeder, stage1tree: stage1, stage2tree: stage2, stage3tree: stage3, stage4tree: stage4, gift: gift, total: total, cash: cash, car: earnings.car, error: error, salary: earnings.salary, empower: earnings.empower, leadership: earnings.leadership, laptop: earnings.laptop, phone: earnings.phone, powerbank: earnings.powerbank, stage4: earnings.stage4, stage3: earnings.stage3, stage2: earnings.stage2, stage1: earnings.stage1, feeder: earnings.feeder });		
-  					}
-  					else{
-  					var earnings = {
-  							feeder: results[0].feeder, 
-  							stage1: results[0].stage1,
-  							stage2: results[0].stage2,
-  							stage3: results[0].stage3,
-  							stage4: results[0].stage4,
-  							powerbank: results[0].powerbank,
-  							phone: results[0].phone,
-  							laptop: results[0].laptop,
-  							leadership: results[0].leadership,
-  							empower: results[0].empower,
-  							salary: results[0].salary,
-                        car: results[0].car
-  						}
-  						var gift = earnings.salary + earnings.powerbank + earnings.phone + earnings.car + earnings.laptop + earnings.empower + earnings.leadership;
-  						var cash  = earnings.feeder + earnings.stage1 + earnings.stage2 + earnings.stage3 + earnings.stage4;
-  						var total = cash + gift;
-  						res.render( 'dashboard', {title: 'USER DASHBOARD', feeder: feeder, stage1: stage1, stage2: stage2, stage3: stage3, stage4: stage4, gift: gift, total: total, cash: cash, car: earnings.car, salary: earnings.salary, empower: earnings.empower, leadership: earnings.leadership, laptop: earnings.laptop, phone: earnings.phone, powerbank: earnings.powerbank, stage4: earnings.stage4, stage3: earnings.stage3, stage2: earnings.stage2, stage: currentstage,  stage1: earnings.stage1, feeder: earnings.feeder });		
-  					}
-  				});
-	});
-	
-	});
-	});
-	});
-	});
-	}
-	}
-	}
-	}
-	} 
-	});
-  			}
-  		});
- });
+				}
+				console.log(stage);
+				if( stage.feeder !== null  && stage.stage1 === null){
+					var currentstage = 'Feeder Stage';
+					console.log(currentstage);
+					if( stage.stage1 !== null  && stage.stage2 === null){
+						var currentstage = ' Stage One';
+						console.log(currentstage);
+						if( stage.stage2 !==  null && stage.stage3 === null){
+							var currentstage = ' Stage Two';
+							console.log(currentstage);
+							if( stage.stage3 !== null  && stage.stage4 === null){
+								var currentstage = ' Stage Three';
+								console.log(currentstage);
+								if( stage.stage4 !== null){
+									var currentstage = ' Stage Four';
+									console.log(currentstage);
+									
+								}
+							}
+						}
+					}
+				}
+				
+			});
+		}
+  });
 });
 
 router.post('/sendmail',  function (req, res, next){
@@ -565,7 +497,7 @@ router.post('/reset', function(req, res, next) {
 	bcrypt.hash(password, saltRounds, null, function(err, hash){
         db.query('UPDATE user SET password = ? WHERE username = ?', [username], function(error, results, fields){
           if (error) throw error;
-          res.redirect( 'login' );
+          res.redirect( 'login' ); 
         });
     });
 });
@@ -784,7 +716,7 @@ router.post('/register', function (req, res, next) {
                     										db.query( 'UPDATE pin SET user = ? WHERE  serial = ?', [username, serial], function ( err, results, fields ){
                     											if( err ) throw err;
                     											//function for matrix
-                    											matrix.normal( username );
+                    											matrix.normal(username);
                     										});
                     									});
                     								});

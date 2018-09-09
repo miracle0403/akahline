@@ -1,0 +1,5 @@
+INSERT INTO `user` (`user_id`, `sponsor`, `username`, `full_name`, `verification`, `status`, `email`, `phone`, `code`, `password`, `paid`, `date`) VALUES ('1', 'mimibest', 'mimilover', 'mira bele', '\'no\'', NULL, 'ghsd@ghgvs.hyjfjhg', '56786546786', '234', '', 'yes', CURRENT_TIMESTAMP);
+INSERT INTO `user_tree` (`sponsor`, `user`, `lft`, `rgt`, `feeder`, `stage1`, `stage2`, `stage3`, `stage4`) VALUES ('mimibest', 'mimilover', '1', '2', 'yes', 'yes', 'yes', 'yes', 'yes');
+INSERT INTO `feeder` (`user`, `amount`, `lft`, `rgt`) VALUES ('mimilover', '0', '1', '2');
+INSERT INTO `feeder_tree` (`matrix_id`, `sponsor`, `user`, `a`, `b`, `c`, `d`) VALUES ('1', 'mimibest', 'mimilover', NULL, NULL, NULL, NULL);
+INSERT INTO `admin` (`user`) VALUES ('mimilover');

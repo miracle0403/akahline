@@ -10,6 +10,20 @@ UPDATE user_tree SET stage1 = "yes" WHERE user = user;
 END //
 DELIMITER ;
 
+drop table feeder_tree
+CREATE TABLE `feeder_tree` (
+	`matrix_id` INT(11) PRIMARY KEY AUTO_INCREMENT NOT NULL,
+	`sponsor` VARCHAR(255) NOT NULL,
+	`user` VARCHAR(255) NOT NULL,
+	`a` VARCHAR(255) NULL DEFAULT NULL,
+	`b` VARCHAR(255) NULL DEFAULT NULL,
+	`c` VARCHAR(255) NULL DEFAULT NULL,
+	`d` VARCHAR(255) NULL DEFAULT NULL
+)
+COLLATE='latin1_swedish_ci'
+ENGINE=InnoDB
+;
+
 DELIMITER //
 CREATE PROCEDURE stage1Amount (user VARCHAR(255))
 BEGIN
@@ -119,7 +133,7 @@ COLLATE='latin1_swedish_ci'
 ENGINE=InnoDB
 ;
 CREATE TABLE `stage1_tree` (
-	`matrix_id` INT(11) UNIQUE PRIMARY KEY AUTO_INCREMENT NOT NULL,
+	`matrix_id` INT(11) PRIMARY KEY AUTO_INCREMENT NOT NULL,
 	`user` VARCHAR(255) NOT NULL,
 	`a` VARCHAR(255) NULL DEFAULT NULL,
 	`b` VARCHAR(255) NULL DEFAULT NULL,
@@ -201,7 +215,7 @@ CREATE TABLE `stage1` (
 );
 
 DELIMITER //
-CREATE PROCEDURE leafadd(sponsor VARCHAR(255), mother VARCHAR(255), child VARCHAR(255),serial VARCHAR(255))
+CREATE PROCEDURE leafadd(sponsor VARCHAR(255), mother VARCHAR(255), child VARCHAR(255))
 BEGIN
 
 SELECT @myLeft := lft FROM feeder WHERE user = mother;
@@ -247,7 +261,7 @@ CREATE TABLE `transactions` (
 );
 
 drop table user;
-CREATE TABLE user( user_id INT( 11 ) UNIQUE PRIMARY KEY AUTO_INCREMENT NOT NULL, sponsor text,  username varchar( 255 ) UNIQUE NOT NULL, full_name varchar ( 255 ) NOT NULL, verification text, status text, email varchar ( 255 ) UNIQUE NOT NULL, phone VARCHAR(255) NOT NULL, code INT( 11 ) NOT NULL, password varchar( 255 ) NOT NULL, paid varchar( 255 ),date DATETIME  DEFAULT CURRENT_TIMESTAMP)	;
+CREATE TABLE `user`( user_id INT( 11 ) PRIMARY KEY AUTO_INCREMENT NOT NULL, sponsor text,  username varchar( 255 ) UNIQUE NOT NULL, full_name varchar ( 255 ) NOT NULL, verification text, status text, email varchar ( 255 ) UNIQUE NOT NULL, phone VARCHAR(255) NOT NULL, code INT( 11 ) NOT NULL, password varchar( 255 ) NOT NULL, paid varchar( 255 ),date DATETIME  DEFAULT CURRENT_TIMESTAMP)	;
 
 CREATE TABLE `profile` (
 	`user` VARCHAR (255) NOT NULL,
@@ -274,9 +288,9 @@ INSERT INTO user_tree(user, rgt, lft) VALUES(username, @myLeft + 2, @myLeft + 1)
 INSERT INTO user (sponsor, full_name, phone, code, username, email, password, status, verification) VALUES ( sponsor, full_name, phone,code, username, email, password, 'active', 'no');
 END//
 DELIMITER ;
-
+drop table user_tree;
 CREATE TABLE `user_tree` (
-	
+	`sponsor` VARCHAR(255) NOT NULL,
 	`user` VARCHAR(255) NOT NULL,
 	`lft` INT(11) NOT NULL,
 	`rgt` INT(11) NOT NULL,
@@ -287,6 +301,45 @@ CREATE TABLE `user_tree` (
 	`stage4` VARCHAR(255)  NULL
 	
 );
+
+CREATE TABLE `stage2_tree` (
+	`matrix_id` INT(11) PRIMARY KEY AUTO_INCREMENT NOT NULL,
+	`sponsor` INT(11) NOT NULL,
+	`user` INT(11) NOT NULL,
+	`a` INT(11) NULL DEFAULT NULL,
+	`b` INT(11) NULL DEFAULT NULL,
+	`c` INT(11) NULL DEFAULT NULL,
+	`d` INT(11) NULL DEFAULT NULL
+)
+COLLATE='latin1_swedish_ci'
+ENGINE=InnoDB
+;
+
+CREATE TABLE `stage3_tree` (
+	`matrix_id` INT(11)PRIMARY KEY AUTO_INCREMENT NOT NULL,
+	`sponsor` INT(11) NOT NULL,
+	`user` INT(11) NOT NULL,
+	`a` INT(11) NULL DEFAULT NULL,
+	`b` INT(11) NULL DEFAULT NULL,
+	`c` INT(11) NULL DEFAULT NULL,
+	`d` INT(11) NULL DEFAULT NULL
+)
+COLLATE='latin1_swedish_ci'
+ENGINE=InnoDB
+;
+
+CREATE TABLE `stage4_tree` (
+	`matrix_id` INT(11) PRIMARY KEY AUTO_INCREMENT NOT NULL,
+	`sponsor` INT(11) NOT NULL,
+	`user` INT(11) NOT NULL,
+	`a` INT(11) NULL DEFAULT NULL,
+	`b` INT(11) NULL DEFAULT NULL,
+	`c` INT(11) NULL DEFAULT NULL,
+	`d` INT(11) NULL DEFAULT NULL
+)
+COLLATE='latin1_swedish_ci'
+ENGINE=InnoDB
+;
 
 DELIMITER //
 CREATE PROCEDURE stage1in( mother VARCHAR(255), child VARCHAR(255))

@@ -1,7 +1,7 @@
 var s1userfunc = require( './s1user.js' );
 var feederfunc = require( './feederspill.js' );
-exports.normal = function normal (x){
-	var db = require( '..db.js' );
+exports.normal = function normal(x){
+	var db = require( '../db.js' );
 	db.query('SELECT parent.sponsor, parent.user FROM user_tree AS node, user_tree AS parent WHERE node.lft BETWEEN parent.lft AND parent.rgt AND node.user = ? AND parent.feeder is not null ORDER BY parent.lft', [x], function(err, results, fields){
 	if( err ) throw err;
 	var last = results.slice(-1)[0];
@@ -20,7 +20,7 @@ exports.normal = function normal (x){
 				 if(first.a === null && first.b === null && first.c === null && first.d === null){
 					db.query('UPDATE feeder_tree SET a = ? WHERE user = ?', [x, user], function(err, results, fields){
 						if(err) throw err;
-						db.query('CALL leafadd(?,?,?,?)', [y, user, x], function(err, results, fields){
+						db.query('CALL leafadd(?,?,?)', [y, user, x], function(err, results, fields){
 				  			if (err) throw err;
 				  			res.render('register', {title: 'Successful Entrance'});
 				  		});
@@ -29,7 +29,7 @@ exports.normal = function normal (x){
 				 if(first.a !== null && first.b === null && first.c === null && first.d === null){
 				 	db.query('UPDATE feeder_tree SET b = ? WHERE user = ?', [x, user], function(err, results, fields){
 						if(err) throw err;
-						db.query('CALL leafadd(?,?,?,?)', [y, user, x], function(err, results, fields){
+						db.query('CALL leafadd(?,?,?)', [y, user, x], function(err, results, fields){
 				  			if (err) throw err;
 							res.render('register', {title: 'Successful Entrance'});
 						});
@@ -38,7 +38,7 @@ exports.normal = function normal (x){
 				 if(first.a !== null && first.b !== null && first.c === null && first.d === null){
 				 	db.query('UPDATE feeder_tree SET c = ? WHERE user = ?', [x, user], function(err, results, fields){
 						if(err) throw err;
-						db.query('CALL leafadd(?,?,?,?)', [y, user, x], function(err, results, fields){
+						db.query('CALL leafadd(?,?,?)', [y, user, x], function(err, results, fields){
 				  			if (err) throw err;
 				  			res.render('register', {title: 'Successful Entrance'});
 				  		});
@@ -49,7 +49,7 @@ exports.normal = function normal (x){
 						if (err) throw err;
 						db.query('UPDATE feeder_tree SET d = ? WHERE user = ?', [x, user], function(err, results, fields){
 							if(err) throw err;
-							db.query('CALL leafadd(?,?,?,?)', [y, user, x], function(err, results, fields){
+							db.query('CALL leafadd(?,?,?)', [y, user, x], function(err, results, fields){
 					  			if (err) throw err;
 					  			//import function to the s1user here
 					  			s1userfunc.s1user(user );
