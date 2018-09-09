@@ -2,7 +2,7 @@ var fillup = require( './withsponsor.js' );
 var db= require('../db.js');
 var stage2func = require( './stage2.js' );
 exports.s1user = function s1user(x, res){
-	db.query('SELECT, parent.sponsor, parent.user FROM user_tree AS node, user_tree AS parent WHERE node.lft BETWEEN parent.lft AND parent.rgt AND node.user = ? AND parent.stage1 is not null ORDER BY parent.lft', [x], function(err, results, fields){
+	db.query('SELECT parent.sponsor, parent.user FROM user_tree AS node, user_tree AS parent WHERE node.lft BETWEEN parent.lft AND parent.rgt AND node.user = ? AND parent.stage1 is not null ORDER BY parent.lft', [x], function(err, results, fields){
                     			if( err ) throw err;
                     			var last1 = results.slice(-1)[0];
                     			var s1user = last1.user;

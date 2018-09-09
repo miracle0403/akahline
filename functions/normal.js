@@ -43,19 +43,21 @@ exports.normal = function normal(x, res){
 				  			res.render('register', {title: 'Successful Entrance'});
 				  		});
 					});
-				 }
+				 } 
 				 if(first.a !== null && first.b !== null && first.c !== null && first.d === null){
 				 	db.query('CALL feederAmount(?)', [user], function(err, results, fields){
 						if (err) throw err;
-						db.query('UPDATE feeder_tree SET d = ? WHERE user = ?', [x, user], function(err, results, fields){
-							if(err) throw err;
-							db.query('CALL leafadd(?,?,?)', [y, user, x], function(err, results, fields){
-					  			if (err) throw err;
-					  			//import function to the s1user here
-					  			s1userfunc.s1user(user, res);
-					  			
-					  			
-					  		});
+						db.query('Update user_tree set stage1 = ? WHERE user = ?', ['yes', user], function(err, results, fields){
+							if (err) throw err;
+							db.query('UPDATE feeder_tree SET d = ? WHERE user = ?', [x, user], function(err, results, fields){
+								if(err) throw err;
+								db.query('CALL leafadd(?,?,?)', [y, user, x], function(err, results, fields){
+									if (err) throw err;
+									//import function to the s1user here
+									s1userfunc.s1user(user, res);
+									
+								});	
+							});
 					  	});
 					}); 
 				 }
