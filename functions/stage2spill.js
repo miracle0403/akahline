@@ -1,6 +1,6 @@
 var db = require( '../db.js' );
 var stage3func = require( './stage3.js' );
-exports.stage2spill = function stage2spill(x, y, z){
+exports.stage2spill = function stage2spill(x, y, z, res){
 	db.query('SELECT node.user,   (COUNT(parent.user) - (sub_tree.depth + 1)) AS depth FROM stage2 AS node, stage2 AS parent, stage2 AS sub_parent, ( SELECT node.user, (COUNT(parent.user) - 1) AS depth FROM stage2 AS node, stage2 AS parent WHERE node.lft BETWEEN parent.lft AND parent.rgt AND node.user = ? GROUP BY node.user ORDER BY node.lft) AS sub_tree WHERE node.amount < 4 AND node.lft BETWEEN parent.lft AND parent.rgt AND node.lft BETWEEN sub_parent.lft AND sub_parent.rgt AND sub_parent.user = sub_tree.user GROUP BY node.user HAVING depth > 0 ORDER BY depth', [y], function(err, results, fields){
 		if( err ) throw err;
 		var stage2depth = results[0].depth;
@@ -78,7 +78,7 @@ exports.stage2spill = function stage2spill(x, y, z){
 													db.query('CALL stage2Amount(?)', [y], function(err, results, fields){
 														if (err) throw err;
 														//function to call stage 3
-														stage3func.stage3(stage24spill.user);
+														stage3func.stage3(stage24spill.user,res);
 													//res.render('register', {title: 'Successful Entrance'});
 												});
 											});
@@ -93,7 +93,7 @@ exports.stage2spill = function stage2spill(x, y, z){
 											d: results[0].d
 										}
 										if(user2.a !== null && user2.b !== null && user2.c !== null && user2.d !== null){
-											stage3func.stage3(x);
+											stage3func.stage3(x, res);
 										}
 									});
 								});

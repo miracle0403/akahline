@@ -283,7 +283,7 @@ UPDATE user_tree SET rgt = rgt + 2 WHERE rgt > @myLeft;
 
 UPDATE user_tree SET lft = lft + 2 WHERE lft > @myLeft;
 
-INSERT INTO user_tree(user, rgt, lft) VALUES(username, @myLeft + 2, @myLeft + 1);
+INSERT INTO user_tree(sponsor, user, rgt, lft) VALUES(sponsor, username, @myLeft + 2, @myLeft + 1);
 
 INSERT INTO user (sponsor, full_name, phone, code, username, email, password, status, verification) VALUES ( sponsor, full_name, phone,code, username, email, password, 'active', 'no');
 END//
@@ -301,40 +301,42 @@ CREATE TABLE `user_tree` (
 	`stage4` VARCHAR(255)  NULL
 	
 );
-
+drop table stage2;
 CREATE TABLE `stage2_tree` (
-	`matrix_id` INT(11) PRIMARY KEY AUTO_INCREMENT NOT NULL,
-	`sponsor` INT(11) NOT NULL,
-	`user` INT(11) NOT NULL,
-	`a` INT(11) NULL DEFAULT NULL,
-	`b` INT(11) NULL DEFAULT NULL,
-	`c` INT(11) NULL DEFAULT NULL,
+	`matrix_id` VARCHAR(255) PRIMARY KEY AUTO_INCREMENT NOT NULL,
+	`sponsor` VARCHAR(255) NOT NULL,
+	`user` VARCHAR(255) NOT NULL,
+	`a` VARCHAR(255) NULL DEFAULT NULL,
+	`b` VARCHAR(255) NULL DEFAULT NULL,
+	`c` VARCHAR(255) NULL DEFAULT NULL,
 	`d` INT(11) NULL DEFAULT NULL
 )
 COLLATE='latin1_swedish_ci'
 ENGINE=InnoDB
 ;
 
+drop table stage3;
 CREATE TABLE `stage3_tree` (
-	`matrix_id` INT(11)PRIMARY KEY AUTO_INCREMENT NOT NULL,
-	`sponsor` INT(11) NOT NULL,
-	`user` INT(11) NOT NULL,
-	`a` INT(11) NULL DEFAULT NULL,
-	`b` INT(11) NULL DEFAULT NULL,
-	`c` INT(11) NULL DEFAULT NULL,
+	`matrix_id` VARCHAR(255) PRIMARY KEY AUTO_INCREMENT NOT NULL,
+	`sponsor` VARCHAR(255) NOT NULL,
+	`user` VARCHAR(255) NOT NULL,
+	`a` VARCHAR(255) NULL DEFAULT NULL,
+	`b` VARCHAR(255) NULL DEFAULT NULL,
+	`c` VARCHAR(255) NULL DEFAULT NULL,
 	`d` INT(11) NULL DEFAULT NULL
 )
 COLLATE='latin1_swedish_ci'
 ENGINE=InnoDB
 ;
 
+drop table stage4;
 CREATE TABLE `stage4_tree` (
-	`matrix_id` INT(11) PRIMARY KEY AUTO_INCREMENT NOT NULL,
-	`sponsor` INT(11) NOT NULL,
-	`user` INT(11) NOT NULL,
-	`a` INT(11) NULL DEFAULT NULL,
-	`b` INT(11) NULL DEFAULT NULL,
-	`c` INT(11) NULL DEFAULT NULL,
+	`matrix_id` VARCHAR(255) PRIMARY KEY AUTO_INCREMENT NOT NULL,
+	`sponsor` VARCHAR(255) NOT NULL,
+	`user` VARCHAR(255) NOT NULL,
+	`a` VARCHAR(255) NULL DEFAULT NULL,
+	`b` VARCHAR(255) NULL DEFAULT NULL,
+	`c` VARCHAR(255) NULL DEFAULT NULL,
 	`d` INT(11) NULL DEFAULT NULL
 )
 COLLATE='latin1_swedish_ci'

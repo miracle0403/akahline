@@ -1,13 +1,13 @@
 var fillup = require( './withsponsor.js' );
 var db= require('../db.js');
 var stage2func = require( './stage2.js' );
-exports.s1user = function s1user(x){
+exports.s1user = function s1user(x, res){
 	db.query('SELECT, parent.sponsor, parent.user FROM user_tree AS node, user_tree AS parent WHERE node.lft BETWEEN parent.lft AND parent.rgt AND node.user = ? AND parent.stage1 is not null ORDER BY parent.lft', [x], function(err, results, fields){
                     			if( err ) throw err;
                     			var last1 = results.slice(-1)[0];
                     			var s1user = last1.user;
                     			var s1spon = last1.sponsor;
-                    			console.log(s1user);
+                    			console.log(last1);
                     			db.query('SELECT * FROM stage1 WHERE user = ?', [s1user], function(err, results, fields){
                     				if( err ) throw err;
                     				var stage1 = {
@@ -171,7 +171,7 @@ exports.s1user = function s1user(x){
 										}
 										if(user.ba !== null && user.bb !== null && user.bc !== null && user.bd !== null && user.aa !== null && user.ab !== null && user.ac !== null && user.ad !== null && user.ca !== null && user.cb !== null && user.cc !== null && user.cd !== null && user.da !== null && user.db !== null && user.dc !== null && user.dd !== null){
 										//call function for stage 2 to 4
-										stage2func.restmatrix(user);
+										stage2func.restmatrix(user, res);
 										}
 									});
 																			});

@@ -1,7 +1,7 @@
 var db  = require( '../db.js' );
 var stage3func = require( './stage3spill.js' );
 var stage4func = require( './stage4.js' );
-exports.stage3 = function stage3( x ){
+exports.stage3 = function stage3( x, res){
 	db.query('SELECT parent.sponsor, parent.user FROM user_tree AS node, user_tree AS parent WHERE node.lft BETWEEN parent.lft AND parent.rgt AND node.user = ? AND parent.stage3 is not null ORDER BY parent.lft', [x], function(err, results, fields){
 		if ( err ) throw err;
 		var last3 = results.slice( -1)[0];
@@ -61,7 +61,7 @@ exports.stage3 = function stage3( x ){
 						db.query('CALL stage3Amount(?)', [s3user], function(err, results, fields){
 							if (err) throw err;
 							//call function to enter stage 4
-							stage4func.stage4( s3user );
+							stage4func.stage4( s3user, res);
 						});
 					});
 				});
@@ -79,7 +79,7 @@ exports.stage3 = function stage3( x ){
 						d: results[0].d
 					}
 					if(user3.a !== null && user3.b !== null && user3.c !== null && user3.d !== null){
-						stage3func.stage4(x);
+						stage3func.stage4(x, res);
 					}
 				});
 		});

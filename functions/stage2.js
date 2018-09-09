@@ -1,7 +1,7 @@
 var db = require( '../db.js' );
 var stage3func = require( './stage3.js' );
 var stage2func = require( './stage2spill.js' );
-exports.restmatrix = function restmatrix(x){
+exports.restmatrix = function restmatrix(x, res){
 	db.query('CALL stage1Amount (?)', [x], function(err, results, fields){
 		if( err ) throw err;
 		db.query('SELECT parent.sponsor, parent.user FROM user_tree AS node, user_tree AS parent WHERE node.lft BETWEEN parent.lft AND parent.rgt AND node.user = ? AND parent.stage2 is not null ORDER BY parent.lft', [x], function(err, results, fields){
@@ -54,7 +54,7 @@ exports.restmatrix = function restmatrix(x){
 							if (err) throw err;
 							db.query('CALL stage2try(?,?,?)', [s2user, s2user, x], function(err, results, fields){
 								 if (err) throw err;
-								 stage3func.stage3(s2user)
+								 stage3func.stage3(s2user, res)
 							 });
 						});
 					});
@@ -72,7 +72,7 @@ exports.restmatrix = function restmatrix(x){
 						d: results[0].d
 					}
 					if(user2.a !== null && user2.b !== null && user2.c !== null && user2.d !== null){
-						stage3func.stage3(x);
+						stage3func.stage3(x,res);
 					}
 				});
 			});

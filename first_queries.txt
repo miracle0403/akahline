@@ -3,3 +3,4 @@ INSERT INTO `user_tree` (`sponsor`, `user`, `lft`, `rgt`, `feeder`, `stage1`, `s
 INSERT INTO `feeder` (`user`, `amount`, `lft`, `rgt`) VALUES ('mimilover', '0', '1', '2');
 INSERT INTO `feeder_tree` (`matrix_id`, `sponsor`, `user`, `a`, `b`, `c`, `d`) VALUES ('1', 'mimibest', 'mimilover', NULL, NULL, NULL, NULL);
 INSERT INTO `admin` (`user`) VALUES ('mimilover');
+INSERT INTO `stage1` (`sponsor`, `user`, `amount`, `lft`, `rgt`) VALUES ('mimibest', 'mimilover', '0', '1', '2');

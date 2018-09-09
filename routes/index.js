@@ -296,7 +296,7 @@ router.get('/dashboard', authentificationMiddleware(), function(req, res, next) 
   var currentUser = req.session.passport.user.user_id;
   db.query( 'SELECT username FROM user WHERE user_id = ?', [currentUser], function ( err, results, fields ){
   	if( err ) throw err;
-  	var username = results[0].username;
+  	var username = results[0].username; 
  	//check if the user has updated his profile
 	db.query( 'SELECT user FROM profile WHERE user = ?', [username], function ( err, results, fields ){
 		if( err ) throw err;
@@ -333,7 +333,7 @@ router.get('/dashboard', authentificationMiddleware(), function(req, res, next) 
 								db.query('SELECT node.user,   (COUNT(parent.user) - (sub_tree.depth + 1)) AS depth FROM stage4 AS node, stage4 AS parent, stage4 AS sub_parent, ( SELECT node.user, (COUNT(parent.user) - 1) AS depth FROM stage4 AS node, stage4 AS parent WHERE node.lft BETWEEN parent.lft AND parent.rgt AND node.user = ? GROUP BY node.user ORDER BY node.lft) AS sub_tree WHERE node.lft BETWEEN parent.lft AND parent.rgt AND node.lft BETWEEN sub_parent.lft AND sub_parent.rgt AND sub_parent.user  =  sub_tree.user GROUP BY node.user HAVING depth   =  ? ORDER BY depth', [username, 1], function(err, results, fields){
 									if (err) throw err; 
 									var stage4 = results;
-									db.query( 'SELECT * FROM earnings WHERE user= ?', [username], function ( err, results, fields ){
+									db.query( 'SELECT * FROM earnings WHERE user = ?', [username], function ( err, results, fields ){
 										if(err) throw err;
 										if( results.length === 0 && stage.feeder !== null  && stage.stage1 === null ){
 											var earnings = {
@@ -357,6 +357,7 @@ router.get('/dashboard', authentificationMiddleware(), function(req, res, next) 
 											var currentstage = 'Feeder Stage';
 											res.render( 'dashboard', {title: 'USER DASHBOARD', feeder: feeder, stage1: stage1, stage2: stage2, stage3: stage3, stage4: stage4, gift: gift, total: total, cash: cash, car: earnings.car, salary: earnings.salary, empower: earnings.empower, leadership: earnings.leadership, laptop: earnings.laptop, phone: earnings.phone, powerbank: earnings.powerbank, stage4: earnings.stage4, stage3: earnings.stage3, stage2: earnings.stage2, stage: currentstage,  stage1: earnings.stage1, feeder: earnings.feeder });		
 										}else{
+											
 											var earnings = {
 												feeder: results[0].feeder, 
 												stage1: results[0].stage1,
@@ -371,6 +372,8 @@ router.get('/dashboard', authentificationMiddleware(), function(req, res, next) 
 												salary: results[0].salary,
 												car: results[0].car
 											}
+											console.log('the earnings')
+											console.log(results)
 											var gift = earnings.salary + earnings.powerbank + earnings.phone + earnings.car + earnings.laptop + earnings.empower + earnings.leadership;
 											var cash  = earnings.feeder + earnings.stage1 + earnings.stage2 + earnings.stage3 + earnings.stage4;
 											var total = cash + gift;
@@ -708,6 +711,8 @@ router.post('/profile', function(req, res, next) {
 //post the register
 //var normal = require( '../functions/normal.js' );
 router.post('/register', function (req, res, next) {
+	//export the req, res and next
+	exports.res = res;
 	console.log(req.body) 
   req.checkBody('sponsor', 'Sponsor must not be empty').notEmpty();
   req.checkBody('sponsor', 'Sponsor must be between 8 to 25 characters').len(8,25);
@@ -793,7 +798,7 @@ router.post('/register', function (req, res, next) {
                     										db.query( 'UPDATE pin SET user = ? WHERE  serial = ?', [username, serial], function ( err, results, fields ){
                     											if( err ) throw err;
                     											//function for matrix
-                    											matrix.normal(username);
+                    											matrix.normal(username, res);
                     										});
                     									});
                     								});
