@@ -2,6 +2,7 @@ DELIMITER //
 CREATE PROCEDURE feederAmount (user VARCHAR(255))
 BEGIN
 INSERT INTO earnings (user, amount) VALUES (user, 6000);
+UPDATE user_tree SET stage1 = "yes" WHERE user = user;
 
 END //
 DELIMITER ;
@@ -16,6 +17,34 @@ CREATE TABLE `feeder_tree` (
 	`b` VARCHAR(255) NULL DEFAULT NULL,
 	`c` VARCHAR(255) NULL DEFAULT NULL,
 	`d` VARCHAR(255) NULL DEFAULT NULL
+)
+COLLATE='latin1_swedish_ci'
+ENGINE=InnoDB
+;
+CREATE TABLE `stage1_tree` (
+	`matrix_id` INT(11) UNIQUE PRIMARY KEY AUTO_INCREMENT NOT NULL,
+	`sponsor` VARCHAR(255) NOT NULL,
+	`user` VARCHAR(255) NOT NULL,
+	`a` VARCHAR(255) NULL DEFAULT NULL,
+	`b` VARCHAR(255) NULL DEFAULT NULL,
+	`c` VARCHAR(255) NULL DEFAULT NULL,
+	`d` VARCHAR(255) NULL DEFAULT NULL,
+	`aa` VARCHAR(255) NULL DEFAULT NULL,
+	`ab` VARCHAR(255) NULL DEFAULT NULL,
+	`ac` VARCHAR(255) NULL DEFAULT NULL,
+	`ad` VARCHAR(255) NULL DEFAULT NULL,
+	`ba` VARCHAR(255) NULL DEFAULT NULL,
+	`bb` VARCHAR(255) NULL DEFAULT NULL,
+	`bc` VARCHAR(255) NULL DEFAULT NULL,
+	`bd` VARCHAR(255) NULL DEFAULT NULL,
+	`ca` VARCHAR(255) NULL DEFAULT NULL,
+	`cb` VARCHAR(255) NULL DEFAULT NULL,
+	`cc` VARCHAR(255) NULL DEFAULT NULL,
+	`cd` VARCHAR(255) NULL DEFAULT NULL,
+	`da` VARCHAR(255) NULL DEFAULT NULL,
+	`db` VARCHAR(255) NULL DEFAULT NULL,
+	`dc` VARCHAR(255) NULL DEFAULT NULL,
+	`dd` VARCHAR(255) NULL DEFAULT NULL
 )
 COLLATE='latin1_swedish_ci'
 ENGINE=InnoDB
@@ -112,6 +141,7 @@ END//
 DELIMITER ;
 
 CREATE TABLE `user_tree` (
+	`sponsor` VARCHAR(255) NOT NULL,
 	`user` VARCHAR(255) NOT NULL,
 	`lft` INT(11) NOT NULL,
 	`rgt` INT(11) NOT NULL,
@@ -122,3 +152,18 @@ CREATE TABLE `user_tree` (
 	`stage4` VARCHAR(255)  NULL
 	
 );
+
+DELIMITER //
+CREATE PROCEDURE stage1in(sponsor INT(11), mother INT(11), child INT(11))
+BEGIN
+SELECT @myLeft := lft FROM stage1 WHERE user = mother;
+INSERT INTO stage1_tree (sponsor, user) VALUES (sponsor, child);
+UPDATE sttage1 SET rgt = rgt + 2 WHERE rgt > @myLeft;
+UPDATE stage1 SET lft = lft + 2 WHERE lft > @myLeft;
+UPDATE stage1 SET amount = amount + 1 WHERE user = mother;
+UPDATE user_tree SET stage1 =  'yes' WHERE user = child;
+
+INSERT INTO stage1(user, lft, rgt) VALUES(child, @myLeft + 1, @myLeft + 2);
+
+END //
+DELIMITER ;

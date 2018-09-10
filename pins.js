@@ -14,6 +14,7 @@ INSERT INTO stage1_tree (sponsor, user) VALUES (sponsor, child);
 UPDATE sttage1 SET rgt = rgt + 2 WHERE rgt > @myLeft;
 UPDATE stage1 SET lft = lft + 2 WHERE lft > @myLeft;
 UPDATE stage1 SET amount = amount + 1 WHERE user = mother;
+UPDATE user_tree SET stage1 =  'yes' WHERE user = child;
 
 INSERT INTO stage1(user, lft, rgt) VALUES(child, @myLeft + 1, @myLeft + 2);
 
