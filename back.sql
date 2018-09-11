@@ -8,7 +8,8 @@ END //
 DELIMITER ;
 
 CREATE TABLE pin( user VARCHAR(255) UNIQUE, serial text NOT NULL, pin varchar( 255 ) NOT NULL, date DATETIME)	;
-
+CREATE TABLE reset( user VARCHAR(255) NOT NULL, status text, code VARCHAR(255) not null, date DATETIME);	;
+							
 CREATE TABLE `feeder_tree` (
 	`matrix_id` INT(11) UNIQUE PRIMARY KEY AUTO_INCREMENT NOT NULL,
 	`sponsor` VARCHAR(255) NOT NULL,
@@ -114,7 +115,7 @@ drop table user;
 CREATE TABLE user( user_id INT( 11 ) UNIQUE PRIMARY KEY AUTO_INCREMENT NOT NULL, sponsor text,  username varchar( 255 ) UNIQUE NOT NULL, full_name varchar ( 255 ) NOT NULL, verification text, status text, email varchar ( 255 ) UNIQUE NOT NULL, phone VARCHAR(255) NOT NULL, code INT( 11 ) NOT NULL, password varchar( 255 ) NOT NULL, paid varchar( 255 ))	;
 
 CREATE TABLE `profile` (
-	`user` INT(11) NOT NULL,
+	`user` VARCHAR (255) NOT NULL,
 	`bank` TEXT NOT NULL,
 	`account_name` TEXT NOT NULL,
 	`account_number` VARCHAR(255) NOT NULL

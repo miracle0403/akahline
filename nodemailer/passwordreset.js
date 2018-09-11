@@ -1,5 +1,9 @@
 exports.passwordreset= function passwordreset(x){
 	var nodemailer = require('nodemailer');
+	var mail = require( '../functions/mailfunctions.js' );
+	var trysend = mail.rese;
+	var pin = mail.pin;
+	console.log( trysend );
 	var hbs = require('nodemailer-express-handlebars');
 	var transporter = nodemailer.createTransport({ 
 		host: 'server206.web-hosting.com', 
@@ -10,15 +14,20 @@ exports.passwordreset= function passwordreset(x){
 			pass:  'Miracle1994' // generated ethereal password } }); 
 		  }
     });
-transporter.use('compile', hbs({ viewPath: './views/', extName: '.hbs' })); 
+transporter.use('compile', hbs({ viewPath: './views/mail', extName: '.hbs' })); 
 
 //the message properties
 	var mailOptions = {
   		from: 'noreply@swiftcircle.website',
   		to: x,
   		subject: 'Password Reset',
-		template: 'emailreset'
-  		
+		template: 'emailreset',
+  		context: {
+  			username: trysend.username,
+  			email: trysend.email,
+  			sponsor: trysend.sponsor,
+  			pin: pin
+  		}
 	}
 	
 // send the mail
@@ -30,7 +39,3 @@ transporter.use('compile', hbs({ viewPath: './views/', extName: '.hbs' }));
 		//console.log(module.exports.email);
   	});
 }
-
-
-
-

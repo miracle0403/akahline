@@ -1,7 +1,7 @@
 'use strict';
 const nodemailer = require('nodemailer');
 //var resete = require('../nodemailer/passwordreset.js');
-var verify = require('../nodemailer/verification.js');
+var reset = require('../functions/mailfunctions.js');
 //var matrix = require('../functions/withsponsor.js');
 var timer = require( '../functions/datefunctions.js' );
 var express = require('express');
@@ -47,8 +47,12 @@ router.get('/', function(req, res, next) {
 });
 
 // get join
-router.get('/join', authentificationMiddleware(), function (req, res, next){
-  res.render('join', {title: "JOIN MATRIX"});
+router.get('/howitworks',  function (req, res, next){
+  res.render('howitworks', {title: "HOW IT WORKS"});
+});
+
+router.get('/faq',  function (req, res, next){
+  res.render('faq', {title: "FAQ"});
 });
 
 // get password reset
@@ -110,59 +114,6 @@ router.get('/reset/:username/:email/:password/:code',  function (req, res, next)
 //var vtimer  = timer.timerreset( )
 //setInterval( 10000, vtimer ); 
 // get password verify
-router.get('/verify/:username/:email/:password/:code',  function (req, res, next){
-  var username = req.params.username;
-  var email = req.params.email;
-  var password = req.params.password;
-  var username = req.params.username;
-  var code = req.params.code;
-  //get username
-    db.query('SELECT username FROM user WHERE username = ?', [username], function(err, results, fields){
-      if (err) throw err;
-      if (results.length === 0){
-        res.render('nullreset', {title: 'Invalid link'});
-		console.log('not a valid username');
-	  }else{
-		  db.query('SELECT email FROM user WHERE email = ?', [email], function(err, results, fields){
-			if (err) throw err;
-			if (results.length === 0){
-				res.render('nullreset', {title: 'Invalid link'});
-				console.log('not a valid username');
-			}else{
-				db.query('SELECT password FROM user WHERE password = ?', [password], function(err, results, fields){
-					if (err) throw err;
-					var pass = results[0].password;
-					//compare password
-						bcrypt.compare( password, pass, null, function ( err, response ){
-					
-					if (response === 0){
-						res.render('nullreset', {title: 'Invalid link'});
-					}else{
-						db.query('SELECT code FROM verify WHERE code = ?', [code], function(err, results, fields){
-							if (err) throw err;
-							if (results.length === 0){
-								res.render('nullreset', {title: 'Invalid link'});
-							}else{
-								db.query('SELECT status FROM verify WHERE code = ?', [code], function(err, results, fields){
-									if (err) throw err;
-									var status = results[0].status;
-									
-									if (status ==='expired'){
-										res.render('nullreset', {title: 'Link Expired!'});
-									}else{
-										res.redirect('login');
-									}
-								});
-							}
-						});
-					}
-					});
-				});
-			}
-		  });
-	  }
-	});
-});
 
 // get password reset
 router.get('/passwordreset',  function (req, res, next){
@@ -267,35 +218,20 @@ router.get('/logout', function(req, res, next) {
 router.get('/dashboard', authentificationMiddleware(), function(req, res, next) {
   var db = require('../db.js');
   var currentUser = req.session.passport.user.user_id;
-  db.query( 'SELECT lft, rgt FROM user_tree WHERE user_id  = ?', [currentUser], function ( err, results, fields ){
-  	if( err ) throw err;
-  	if( results.length === 0){
-  		db.query( 'SELECT sponsor FROM user WHERE user_id = ?', [currentUser], function ( err, results, fields ){
-  			if ( err ) throw err;
-  			var spo = results[0].sponsor;
-  			console.log( 'spo is ' + spo);
-  					db.query( 'SELECT user_id FROM user WHERE username = ?', [spo], function ( err, results, fields ){
-  				if ( err ) throw err;
-  				var spoid = results[0].user_id;
-  				console.log( spoid);
-  				db.query( 'CALL useradd ( ?,? )', [spoid, currentUser], function( err, results, fields) {
-  					if ( err ) throw err;
-  					res.render( 'dashboard' )
-  				});
-  			});
-  		});
-  	}
-  	//if the user had been added...
-  	if( results.length !== 0 ){
+  
+  		pool.query( 'SELECT username FROM user WHERE user_id = ?', [currentUser], function ( err, results, fields ){
+  		if( err ) throw err;
+  		var username = results[0].username;
   		//check if the user has updated his profile
-  		db.query( 'SELECT user_id FROM profile WHERE user_id = ?', [currentUser], function ( err, results, fields ){
+  		
+  		pool.query( 'SELECT user FROM profile WHERE user = ?', [username], function ( err, results, fields ){
   			if( err ) throw err;
   			if( results.length === 0 ){
   				res.redirect( 'profile' )
   			}
   			else{
   				//get the earnings
-  				db.query( 'SELECT * FROM earnings WHERE user_id  = ?', [currentUser], function ( err, results, fields ){
+  				pool.query( 'SELECT * FROM earnings WHERE user= ?', [username], function ( err, results, fields ){
   					if( err ) throw err;
   					if( results.length === 0 ){
   						var noearnings = 0;
@@ -315,38 +251,30 @@ router.get('/dashboard', authentificationMiddleware(), function(req, res, next) 
   							empower: results[0].empower,
   							salary: results[0].salary
   						}
-  						db.query( 'SELECT feeder FROM user_tree WHERE user_id  = ?', [currentUser], function ( err, results, fields){
-  							if( err ) throw err;
-  							console.log( results )
-  							var feeder = results[0].feeder;
-  							console.log( feeder);
-  							if (feeder === null){
-  								var error = 'You are not yet in the matrix... please click on join matrix to join';
+  						pool.releaseConnection(  )
   						res.render( 'dashboard', {title: 'USER DASHBOARD', error: error, salary: earnings.salary, empower: earnings.empower, leadership: earnings.leadership, laptop: earnings.laptop, phone: earnings.phone, powerbank: earnings.powerbank, stage4: earnings.stage4, stage3: earnings.stage3, stage2: earnings.stage2, stage1: earnings.stage1, feeder: earnings.feeder });		
-  						}
-  					  });
   					}
   				});
   			}
   		});
-  	}
-  });
+ });
 });
 
 //get profile
 router.get('/profile', authentificationMiddleware(), function(req, res, next) {
   var currentUser = req.session.passport.user.user_id;
   //get user details to showcase
-  db.query('SELECT full_name, code, phone FROM user WHERE user_id = ?', [currentUser], function(err, results, fields){
+  db.query('SELECT full_name, code, username, phone FROM user WHERE user_id = ?', [currentUser], function(err, results, fields){
     if (err) throw err;
     console.log(results)
     var bio = {
    	 	fullname: results[0].full_name,
     	code: results[0].code,
-    	phone: results[0].phone
+    	phone: results[0].phone,
+    	username: results[0].username
     }
     //get from profile table
-    db.query('SELECT * FROM profile WHERE user_id = ?', [currentUser], function(err, results, fields){
+    db.query('SELECT * FROM profile WHERE user = ?', [bio.username], function(err, results, fields){
       if (err) throw err;
       console.log(results)
       if ( results.length === 0 ){
@@ -365,6 +293,38 @@ router.get('/profile', authentificationMiddleware(), function(req, res, next) {
   });
 });
 
+// post password reset
+router.post('/passwordreset',  function (req, res, next){
+req.checkBody('username', 'Username must be between 8 to 25 characters').len(8,25);
+req.checkBody('email', 'Invalid Email').isEmail();
+req.checkBody('email', 'Email must be between 8 to 105 characters').len(8,105);
+var errors = req.validationErrors();
+
+  if (errors) { 
+    console.log(JSON.stringify(errors));
+  res.render('reset', {title: "RESET PASSWORD FAILED", error: errors});
+  }else{
+  	var username = req.body.username;
+  	var email = req.body.email;
+  }
+  pool.getConnection( function( err, con ){
+  if ( err ) throw err;
+  	con.query( 'SELECT username, email FROM user WHERE username = ? AND email = ?', [username, email], function ( err, results, fields ){
+  		if( err ) throw err;
+  		if( results.length === 0 ){
+  			var error  = 'Sorry, We could not find your account';
+  			res.render('passwordreset', {title: "RESET PASSWORD FAILED", error: error});
+  		}else{
+  			var username = results[0].username;
+  			var email = results[0].email;
+  			var success = 'Great! We found your account! Check your mail for a confirmation mail. If you do not find it in your inbox, check your spam.'
+  			//function to send mail here
+  			reset.sendreset( username, email );
+  			res.render('passwordreset', {title: "RESET PASSWORD", error: success});
+  		}
+ 	 })
+  });
+});
 
 //post register
 router.post('/register', function(req, res, next) {
@@ -1475,31 +1435,32 @@ router.post('/profile', function(req, res, next) {
     var currentUser = req.session.passport.user.user_id;
 
     //get sponsor name from database to profile page
-    pool.query('SELECT password FROM user WHERE user_id = ?', [currentUser], function(err, results, fields){
+    pool.query('SELECT password, username FROM user WHERE user_id = ?', [currentUser], function(err, results, fields){
       if (err) throw err;
       const hash = results[0].password;
+      var username = results[0].username;
       //compare password
       bcrypt.compare(password, hash, function(err, response){
         if(response === false){
-        error = "Password is not correct";
-          res.render('profile', { title: 'Profile Update failed', error: error});
+        var error = "Password is not correct";
+          res.render('profile', { title: 'Profile Update failed', errors: error});
         }else{
               //update user
               pool.query('UPDATE user SET full_name = ?, code = ?, phone = ? WHERE user_id = ?', [fullname, code, phone, currentUser], function(err, results,fields){
                 if (err) throw err;
 
                 //check if user has updated profile before now
-                pool.query('SELECT user_id FROM profile WHERE user_id = ?', [currentUser], function(err, results, fields){
+                pool.query('SELECT user FROM profile WHERE user = ?', [username], function(err, results, fields){
                   if (err) throw err;
       
                   if (results.length===0){
-                    pool.query('INSERT INTO profile (user_id, bank, account_name, account_number) VALUES (?, ?, ?, ?)', [currentUser, bank, accountName, accountNumber], function(error, result, fields){
+                    pool.query('INSERT INTO profile (user, bank, account_name, account_number) VALUES (?, ?, ?, ?)', [username, bank, accountName, accountNumber], function(error, result, fields){
                       if (error) throw error;
                       console.log(results);
-                      res.render('profile', {title: "UPDATE UNSUCCESSFUL"});  
+                      res.render('profile', {title: "UPDATE SUCCESSFUL"});  
                     });
                   }else{
-                    pool.query('UPDATE profile SET bank = ?, account_name = ?, account_number = ? WHERE user_id = ?', [bank, accountName, accountNumber, currentUser], function(err, results,fields){
+                    pool.query('UPDATE profile SET bank = ?, account_name = ?, account_number = ? WHERE user = ?', [bank, accountName, accountNumber, username], function(err, results,fields){
                       if (err) throw err;
                       var success = "Profile Updated";
                       console.log(results);
