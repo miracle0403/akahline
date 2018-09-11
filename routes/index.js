@@ -313,14 +313,14 @@ var errors = req.validationErrors();
   		if( err ) throw err;
   		if( results.length === 0 ){
   			var error  = 'Sorry, We could not find your account';
-  			res.render('passwordreset', {title: "RESET PASSWORD FAILED", error: error});
+  			res.render('passwordreset', {title: "RESET PASSWORD FAILED", errors: error});
   		}else{
   			var username = results[0].username;
   			var email = results[0].email;
   			var success = 'Great! We found your account! Check your mail for a confirmation mail. If you do not find it in your inbox, check your spam.'
   			//function to send mail here
   			reset.sendreset( username, email );
-  			res.render('passwordreset', {title: "RESET PASSWORD", error: success});
+  			res.render('passwordreset', {title: "RESET PASSWORD", errors: success});
   		}
  	 })
   });

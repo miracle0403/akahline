@@ -7,8 +7,9 @@ UPDATE user_tree SET stage1 = "yes" WHERE user = user;
 END //
 DELIMITER ;
 
-CREATE TABLE pin( user VARCHAR(255) UNIQUE, serial text NOT NULL, pin varchar( 255 ) NOT NULL, date DATETIME)	;
-CREATE TABLE reset( user VARCHAR(255) NOT NULL, status text, code VARCHAR(255) not null, date DATETIME);	;
+CREATE TABLE pin( user VARCHAR(255) UNIQUE, serial text NOT NULL, pin varchar( 255 ) NOT NULL, date DATETIME);
+
+CREATE TABLE reset( user VARCHAR(255) NOT NULL, status text, code VARCHAR(255) not null, date DATETIME default GETDATE());
 							
 CREATE TABLE `feeder_tree` (
 	`matrix_id` INT(11) UNIQUE PRIMARY KEY AUTO_INCREMENT NOT NULL,
