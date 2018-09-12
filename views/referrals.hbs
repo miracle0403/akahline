@@ -1,26 +1,28 @@
 {{> spageh}}
 {{> nav}}
-<div class="col-md-12">
-                        <div class="card">
-                            <div class="header">
-                                </div>
-                            <div class="content">
-                                <h4 class="title">Your sponsor is {{sponsor}}</h4><br><br>
-                                <h6 class="category">Link to the registration page is <a href="{{register}}">akahlineglobalservices{{register}}</a></h6>
-								<br>
-								<br>
-								<br>
-								<div class="content table-responsive table-full-width">
-                                <table class="table table-striped">
-								<thead>
-                                        <th>Name</th>
-										<th>Email</th>
-										<th>Phone Number</th>
-										<th>Username</th>
-										<th>Status</th>
-										<th>Date of joining</th>
-                                    </thead>
-									{{#if referrals}}
+<br><br><br>
+<div class="container"> 
+        <h4 style="text-align: center">{{title}}</h4><hr style="size: 50% color:navy"><br>
+     </div>
+     <div class="container"> 
+        <h6 style="text-align: center">Your sponsor is {{sponsor}}</h6><hr style="size: 50% color:navy"><br>
+        <h6 class="category">Link to the registration page is <a href="{{register}}">akahlineglobalservices{{register}}</a></h6>
+     </div>
+                            <div class="container-fluid"> 
+                            <h2>MY REFERRALS</h2>
+                            <div class="table-responsive">
+            <table class="table table-striped table-sm">
+            <thead>
+                <tr>
+                  <th>Full Name</th>
+                  <th>Phone Number</th>
+                  <th>Username</th>
+                  <th>Email</th>
+                  <th>Status</th>
+                  <th>Date of joining</th>
+                </tr>
+              </thead>
+              	{{#if referrals}}
 									{{#each referrals}}
 									<tr>
 										<td>{{name}}</td>
@@ -32,14 +34,8 @@
 									</tr>
 									{{/each}}
 									{{/if}}
-									</table>
-								</div>
-                                    <hr>
-                                    <div class="stats">
-                                        <i class="ti-reload"></i> Updated 3 minutes ago
-                                    </div>
-                                </div>
+            </div>
+            </table>
                             </div>
-                        </div>
-                    </div>
-                </div>
+                                
+								{{> spagef}}
