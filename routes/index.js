@@ -1387,9 +1387,9 @@ passport.deserializeUser(function(user_id, done){
   done(null, user_id)
 });
 
-
+pinset( )
 //get function for pin and serial number
-exports.pinset = function pinset(){
+function pinset(){
 var mail = require( '../nodemailer/pin.js' );
   var charSet = new securePin.CharSet(); 
   charSet.addLowerCaseAlpha().addUpperCaseAlpha().addNumeric().randomize();
@@ -1405,8 +1405,9 @@ var mail = require( '../nodemailer/pin.js' );
           exports.str = str;
           //console.log(results)
           //the function to send mail
-          var mail = 'Sageabraham4@gmail.com';
-          mail.sendpin( mail );
+         // var mail = 'Sageabraham4@gmail.com';
+         var mail = 'mify1@yahoo.com';
+         // mail.sendpin( mail );
         });
       });
     });

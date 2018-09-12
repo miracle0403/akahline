@@ -18,7 +18,7 @@ pool.getConnection( function ( err, con ){
 		con.query( 'SELECT username FROM user', function ( err, results, fields ){
 			if ( err ) throw err;
 			else{
-			console.log( results);
+			console.log( results[0]);
 			pool.releaseConnection( con );
 			}
 		});
