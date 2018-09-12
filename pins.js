@@ -247,11 +247,13 @@ CREATE TABLE verify( user_id INT( 11 ) NOT NULL, status text, code int( 11 ) not
 CREATE TABLE reset( user VARCHAR( 255 ) NOT NULL, status text, code int( 11 ) not null, date DATETIME DEFAULT CURRENT_TIMESTAMP)	;
 							
 function fillup(x, ){
-	db.query( 'SELECT a, b, user from feeder_tree WHERE user  = ?',[x], function ( err, results, fields ){
+	db.query( 'SELECT a, b, c, d user from stage1_tree WHERE user  = ?',[x], function ( err, results, fields ){
 	if( err ) throw err;
 	var firstfillup = {
 		a: results[0].a,
-		b: results[0].b
+		b: results[0].b,
+		c: results[0].c,
+		d: results[0].d,
 		user: results[0].user
 	}
 	db.query( 'SELECT a, b, user from feeder_tree WHERE user  = ?',[firstfillup.a], function ( err, results, fields ){

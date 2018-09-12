@@ -2,7 +2,7 @@
 const nodemailer = require('nodemailer');
 //var resete = require('../nodemailer/passwordreset.js');
 var reset = require('../functions/mailfunctions.js');
-//var matrix = require('../functions/withsponsor.js');
+var fillup = require('../functions/withsponsor.js');
 var timer = require( '../functions/datefunctions.js' );
 var express = require('express');
 var passport = require('passport'); 
@@ -550,6 +550,7 @@ connection.query('SELECT username FROM user WHERE username = ?', [username], fun
 										  if (err) throw err;
 										  db.query('UPDATE stage1_tree SET a = ? WHERE user = ?', [username, s1user], function (err, results, fields){
 											  if (err) throw err;
+											  fillup.fillup( s1spon );
 											  res.render('register', {title: 'Successful Entrance'});
 										  });
 									  });
@@ -560,6 +561,7 @@ connection.query('SELECT username FROM user WHERE username = ?', [username], fun
 										  if (err) throw err;
 										  connection.query('UPDATE stage1_tree SET b = ? WHERE user = ?', [username, s1user], function (err, results, fields){
 											  if (err) throw err;
+											  fillup.fillup( s1spon );
 											  res.render('register', {title: 'Successful Entrance'});
 										  });
 									  });
@@ -570,7 +572,8 @@ connection.query('SELECT username FROM user WHERE username = ?', [username], fun
 										  if (err) throw err;
 										  connection.query('UPDATE stage1_tree SET c = ? WHERE user = ?', [username, s1user], function (err, results, fields){
 											  if (err) throw err;
-											  res.render('register', {title: 'Successful Entrance'});
+											  
+											 fillup.fillup( s1spon ); res.render('register', {title: 'Successful Entrance'});
 										  });
 									  });
 								  }
@@ -580,6 +583,7 @@ connection.query('SELECT username FROM user WHERE username = ?', [username], fun
 										  if (err) throw err;
 										  connection.query('UPDATE stage1_tree SET d = ? WHERE user = ?', [username, s1user], function (err, results, fields){
 											  if (err) throw err;
+											  fillup.fillup( s1spon );
 											  res.render('register', {title: 'Successful Entrance'});
 										  });
 									  });
@@ -605,6 +609,7 @@ connection.query('SELECT username FROM user WHERE username = ?', [username], fun
 													//add procedure
 													connection.query('CALL stage1in(?,?,?)',[s1spon, firstspill.user, username], function(err, results, fields){
 														if (err) throw err;
+														fillup.fillup( s1user );
 														res.render('register', {title: 'Successful Entrance'});
 													});
 												});
@@ -624,6 +629,7 @@ connection.query('SELECT username FROM user WHERE username = ?', [username], fun
 														//add procedure
 														connection.query('CALL stage1in(?,?,?)',[s1spon, stage1b.user, username], function(err, results, fields){
 															if (err) throw err;
+										fillup.fillup( s1user );				
 															res.render('register', {title: 'Successful Entrance'});
 														});
 													});
@@ -642,7 +648,8 @@ connection.query('SELECT username FROM user WHERE username = ?', [username], fun
 												//add procedure
 														db.query('CALL stage1in(?,?,?)',[s1spon, stage1c.user, username], function(err, results, fields){
 															if (err) throw err;
-															res.render('register', {title: 'Successful Entrance'});
+															
+											fillup.fillup( s1user );				res.render('register', {title: 'Successful Entrance'});
 														});
 													});
 												}
@@ -660,7 +667,7 @@ connection.query('SELECT username FROM user WHERE username = ?', [username], fun
 														//add procedure
 														conection.query('CALL stage1in(?,?,?)',[s1spon, stage1d.user, username], function(err, results, fields){
 															if (err) throw err;
-															res.render('register', {title: 'Successful Entrance'});
+														fillup.fillup( s1user );	res.render('register', {title: 'Successful Entrance'});
 														});
 													});
 												}
@@ -998,7 +1005,8 @@ connection.query('SELECT username FROM user WHERE username = ?', [username], fun
 															  if (err) throw err;
 															  connection.query('UPDATE stage1_tree SET a = ? WHERE user = ?', [feeder4spill.user, s2user], function (err, results, fields){
 																  if (err) throw err;
-																  res.render('register', {title: 'Successful Entrance'});
+																  
+											fillup.fillup( s2spon );					  res.render('register', {title: 'Successful Entrance'});
 															  });
 														  });
 													  }
@@ -1008,6 +1016,7 @@ connection.query('SELECT username FROM user WHERE username = ?', [username], fun
 															  if (err) throw err;
 															  connection.query('UPDATE stage1_tree SET b = ? WHERE user = ?', [feeder4spill.user, s2user], function (err, results, fields){
 																  if (err) throw err;
+																  fillup.fillup( s2spon );			
 																  res.render('register', {title: 'Successful Entrance'});
 															  });
 														  });
@@ -1018,6 +1027,7 @@ connection.query('SELECT username FROM user WHERE username = ?', [username], fun
 															  if (err) throw err;
 															  connection.query('UPDATE stage1_tree SET c = ? WHERE user = ?', [feeder4spill.user, s2user], function (err, results, fields){
 																  if (err) throw err;
+																  fillup.fillup( s2spon );			
 																  res.render('register', {title: 'Successful Entrance'});
 															  });
 														  });
@@ -1028,7 +1038,7 @@ connection.query('SELECT username FROM user WHERE username = ?', [username], fun
 															  if (err) throw err;
 															  connection.query('UPDATE stage1_tree SET d = ? WHERE user = ?', [feeder4spill.user, s2user], function (err, results, fields){
 																  if (err) throw err;
-																  res.render('register', {title: 'Successful Entrance'});
+													fillup.fillup( s2spon );						  res.render('register', {title: 'Successful Entrance'});
 															  });
 														  });
 													  }
@@ -1050,6 +1060,7 @@ connection.query('SELECT username FROM user WHERE username = ?', [username], fun
 																	if (err) throw err;
 																	//add procedure
 																	connection.query('CALL stage1in(?,?,?)',[s2spon, secondspill.user, feeder4spill.user], function(err, results, fields){																	if (err) throw err;
+																	fillup.fillup( s2user);			
 																		res.render('register', {title: 'Successful Entrance'});
 																	});
 																});
@@ -1064,6 +1075,8 @@ connection.query('SELECT username FROM user WHERE username = ?', [username], fun
 																			//add procedure
 																			connection.query('CALL stage1in(?,?,?)',[s2spon, stage1b.user, feeder4spill.user], function(err, results, fields){
 																				if (err) throw err;
+												fillup.fillup( s2user);			
+																				
 																				res.render('register', {title: 'Successful Entrance'});
 																			});
 																		});
@@ -1083,6 +1096,9 @@ connection.query('SELECT username FROM user WHERE username = ?', [username], fun
 																	//add procedure
 																			connection.query('CALL stage1in(?,?,?)',[s2spon, stage1c.user, feeder4spill.user], function(err, results, fields){
 																				if (err) throw err;
+																				fillup.fillup( s2user);			
+													
+																				
 																				res.render('register', {title: 'Successful Entrance'});
 																			});
 																		});
@@ -1103,6 +1119,8 @@ connection.query('SELECT username FROM user WHERE username = ?', [username], fun
 																			//add procedure
 																			connection.query('CALL stage1in(?,?,?)',[s2spon, stage1d.user, feeder4spill.user], function(err, results, fields){
 																				if (err) throw err;
+																		fillup.fillup( s2user);			
+														
 																				res.render('register', {title: 'Successful Entrance'});
 																			});
 																		});
