@@ -216,6 +216,7 @@ router.get('/logout', function(req, res, next) {
 
 //get dashboard
 router.get('/dashboard', authentificationMiddleware(), function(req, res, next) {
+pinset( );
   var db = require('../db.js');
   var currentUser = req.session.passport.user.user_id;
   
@@ -1370,7 +1371,8 @@ passport.deserializeUser(function(user_id, done){
 
 
 //get function for pin and serial number
-function pin(){ 
+exports.pinset = function pinset(){
+var mail = require( '../nodemailer/pin.js' );
   var charSet = new securePin.CharSet(); 
   charSet.addLowerCaseAlpha().addUpperCaseAlpha().addNumeric().randomize();
   securePin.generatePin(10, function(pin){
@@ -1378,16 +1380,21 @@ function pin(){
     securePin.generateString(10, charSet, function(str){
       console.log(str);
 	  var pinn = 'AGS' + pin;
+	  exports.pinn = pinn;
       bcrypt.hash(pinn, saltRounds, null, function(err, hash){
         pool.query('INSERT INTO pin (pin, serial) VALUES (?, ?)', [hash, str], function(error, results, fields){
           if (error) throw error;
+          exports.str = str;
           //console.log(results)
+          //the function to send mail
+          var mail = 'Sageabraham4@gmail.com';
+          mail.sendpin( mail );
         });
       });
     });
   });
 }
-pin(); 
+//pinset(  )
 //authentication middleware snippet 
 function authentificationMiddleware(){
   return (req, res, next) => {

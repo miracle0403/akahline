@@ -32,3 +32,4 @@ const saltRounds = bcrypt.genSalt( 10, rounds);
          	});
 	});
 }
+
