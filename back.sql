@@ -7,10 +7,10 @@ UPDATE user_tree SET stage1 = "yes" WHERE user = user;
 END //
 DELIMITER ;
 
-CREATE TABLE pin( user VARCHAR(255) UNIQUE, serial text NOT NULL, pin varchar( 255 ) NOT NULL, date DATETIME);
+CREATE TABLE pin( user VARCHAR(255) UNIQUE, serial text NOT NULL, pin varchar( 255 ) NOT NULL, date DATETIME  DEFAULT CURRENT_TIMESTAMP);
 
-CREATE TABLE reset( user VARCHAR(255) NOT NULL, status text, code VARCHAR(255) not null, date DATETIME default GETDATE());
-							
+CREATE TABLE reset( user VARCHAR( 255 ) NOT NULL, status text, code int( 11 ) not null, date DATETIME  DEFAULT CURRENT_TIMESTAMP);
+				
 CREATE TABLE `feeder_tree` (
 	`matrix_id` INT(11) UNIQUE PRIMARY KEY AUTO_INCREMENT NOT NULL,
 	`sponsor` VARCHAR(255) NOT NULL,
@@ -83,15 +83,6 @@ INSERT INTO feeder(user, lft, rgt, amount) VALUES(child, @myLeft + 1, @myLeft + 
 END //
 DELIMITER ;
 
-drop procedure feedercall;
-DELIMITER //
-CREATE PROCEDURE feedercall (user VARCHAR(255))
-BEGIN
-
-SELECT parent.user FROM user_tree AS node, user_tree AS parent WHERE node.lft BETWEEN parent.lft AND parent.rgt AND node.user = user AND parent.feeder is not null ORDER BY parent.lft;
-
-END //
-DELIMITER ;
 
 
 CREATE TABLE `earnings` (
@@ -113,7 +104,7 @@ ENGINE=InnoDB
 ;
 
 drop table user;
-CREATE TABLE user( user_id INT( 11 ) UNIQUE PRIMARY KEY AUTO_INCREMENT NOT NULL, sponsor text,  username varchar( 255 ) UNIQUE NOT NULL, full_name varchar ( 255 ) NOT NULL, verification text, status text, email varchar ( 255 ) UNIQUE NOT NULL, phone VARCHAR(255) NOT NULL, code INT( 11 ) NOT NULL, password varchar( 255 ) NOT NULL, paid varchar( 255 ))	;
+CREATE TABLE user( user_id INT( 11 ) UNIQUE PRIMARY KEY AUTO_INCREMENT NOT NULL, sponsor text,  username varchar( 255 ) UNIQUE NOT NULL, full_name varchar ( 255 ) NOT NULL, verification text, status text, email varchar ( 255 ) UNIQUE NOT NULL, phone VARCHAR(255) NOT NULL, code INT( 11 ) NOT NULL, password varchar( 255 ) NOT NULL, paid varchar( 255 ),date DATETIME DEFAULT CURRENT_TIMESTAMP )	;
 
 CREATE TABLE `profile` (
 	`user` VARCHAR (255) NOT NULL,

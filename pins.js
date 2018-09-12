@@ -244,7 +244,7 @@ DELIMITER ;
 //create verify table
 CREATE TABLE verify( user_id INT( 11 ) NOT NULL, status text, code int( 11 ) not null, date DATETIME)	;
 							
-CREATE TABLE reset( user_id INT( 11 ) NOT NULL, status text, code int( 11 ) not null, date DATETIME)	;
+CREATE TABLE reset( user VARCHAR( 255 ) NOT NULL, status text, code int( 11 ) not null, date DATETIME DEFAULT CURRENT_TIMESTAMP)	;
 							
 function fillup(x, ){
 	db.query( 'SELECT a, b, user from feeder_tree WHERE user  = ?',[x], function ( err, results, fields ){
