@@ -80,27 +80,23 @@ router.get('/reset/:username/:email/:password/:code',  function (req, res, next)
 					if (results.length === 0){
 						res.render('nullreset', {title: 'Invalid link'});
 					}else{
-						db.query('SELECT code FROM reset WHERE code = ?', [code], function(err, results, fields){
+						db.query('SELECT code FROM reset WHERE status = ? AND user = ?', ['active', username], function(err, results, fields){
 							if (err) throw err;
 							if (results.length === 0){
 								res.render('nullreset', {title: 'Invalid link'});
 							}else{
-								db.query('SELECT status FROM reset WHERE code = ?', [code], function(err, results, fields){
-									if (err) throw err;
-									var status = results[0].status;
-									
-									if (status ==='expired'){
-										res.render('nullreset', {title: 'Link Expired!'});
-									}else{
-										db.query( 'UPDATE user SET verification  = ? WHERE username = ?',['yes', username], function ( err, results, fields ){
+							var hash = results[0].code;
+								bcrypt.compare(code, hash, function(err, response){
+								if (response === true){
+									res.render('nullreset', {title: 'Invalid link'});
+								}else {
+									db.query( 'UPDATE reset SET status = ? WHERE user = ?',['expired', username], function ( err, results, fields ){
 											if( err ) throw err;
-											db.query( 'UPDATE verify SET status = ? WHERE username = ?',['expired', username], function ( err, results, fields ){
-											if( err ) throw err;
-										res.redirect('dashboard');
+											res.redirect( 'reset' );
 											});
-										})	;
-									}
+								}
 								});
+         
 							}
 						});
 					}
@@ -120,8 +116,8 @@ router.get('/passwordreset',  function (req, res, next){
   res.render('passwordreset', {title: "PASSWORD RESET"});
 });
 // get verification
-router.get('/verify',  function (req, res, next){
-  res.render('verify', {title: "Verify Email"});
+router.get('/manage',  function (req, res, next){
+  res.render('manage', {title: "MANAGE USERS"});
 });
 
 
@@ -228,34 +224,67 @@ pinset( );
   		pool.query( 'SELECT user FROM profile WHERE user = ?', [username], function ( err, results, fields ){
   			if( err ) throw err;
   			if( results.length === 0 ){
-  				res.redirect( 'profile' )
+  				var error = 'Please update your profile to see your stats.';
+  				res.render( 'dashboard', {title: 'DASHBOARD', error: error});
   			}
   			else{
-  				//get the earnings
+  			pool.query('SELECT node.user,   (COUNT(parent.user) - (sub_tree.depth + 1)) AS depth FROM feeder AS node, feeder AS parent, feeder AS sub_parent, ( SELECT node.user, (COUNT(parent.user) - 1) AS depth FROM feeder AS node, feeder AS parent WHERE node.lft BETWEEN parent.lft AND parent.rgt AND node.user = ? GROUP BY node.user ORDER BY node.lft) AS sub_tree WHERE node.lft BETWEEN parent.lft AND parent.rgt AND node.lft BETWEEN sub_parent.lft AND sub_parent.rgt AND sub_parent.user = sub_tree.user GROUP BY node.user HAVING depth  = ? ORDER BY depth', [username, 1], function(err, results, fields){
+												if (err) throw err; 
+	
+	var feeder = results;
+	pool.query('SELECT node.user,   (COUNT(parent.user) - (sub_tree.depth + 1)) AS depth FROM stage1 AS node, stage1 AS parent, stage1 AS sub_parent, ( SELECT node.user, (COUNT(parent.user) - 1) AS depth FROM stage1 AS node, stage1 AS parent WHERE node.lft BETWEEN parent.lft AND parent.rgt AND node.user = ? GROUP BY node.user ORDER BY node.lft) AS sub_tree WHERE node.lft BETWEEN parent.lft AND parent.rgt AND node.lft BETWEEN sub_parent.lft AND sub_parent.rgt AND sub_parent.user  =  sub_tree.user GROUP BY node.user HAVING depth  < ? ORDER BY depth', [username, 3], function(err, results, fields){
+												if (err) throw err; 
+	
+	var stage1 = results;
+	pool.query('SELECT node.user,   (COUNT(parent.user) - (sub_tree.depth + 1)) AS depth FROM stage2 AS node, stage2 AS parent, stage2 AS sub_parent, ( SELECT node.user, (COUNT(parent.user) - 1) AS depth FROM stage2 AS node, stage2 AS parent WHERE node.lft BETWEEN parent.lft AND parent.rgt AND node.user = ? GROUP BY node.user ORDER BY node.lft) AS sub_tree WHERE node.lft BETWEEN parent.lft AND parent.rgt AND node.lft BETWEEN sub_parent.lft AND sub_parent.rgt AND sub_parent.user  =  sub_tree.user GROUP BY node.user HAVING depth   = ? ORDER BY depth', [username, 1], function(err, results, fields){
+												if (err) throw err; 
+	
+	var stage2 = results;
+	pool.query('SELECT node.user,   (COUNT(parent.user) - (sub_tree.depth + 1)) AS depth FROM stage3 AS node, stage3 AS parent, stage3 AS sub_parent, ( SELECT node.user, (COUNT(parent.user) - 1) AS depth FROM stage3 AS node, stage3 AS parent WHERE node.lft BETWEEN parent.lft AND parent.rgt AND node.user = ? GROUP BY node.user ORDER BY node.lft) AS sub_tree WHERE node.lft BETWEEN parent.lft AND parent.rgt AND node.lft BETWEEN sub_parent.lft AND sub_parent.rgt AND sub_parent.user  =  sub_tree.user GROUP BY node.user HAVING depth   =  ? ORDER BY depth', [username, 1], function(err, results, fields){
+												if (err) throw err; 
+	
+	var stage3 = results;
+	pool.query('SELECT node.user,   (COUNT(parent.user) - (sub_tree.depth + 1)) AS depth FROM stage4 AS node, stage4 AS parent, stage4 AS sub_parent, ( SELECT node.user, (COUNT(parent.user) - 1) AS depth FROM stage4 AS node, stage4 AS parent WHERE node.lft BETWEEN parent.lft AND parent.rgt AND node.user = ? GROUP BY node.user ORDER BY node.lft) AS sub_tree WHERE node.lft BETWEEN parent.lft AND parent.rgt AND node.lft BETWEEN sub_parent.lft AND sub_parent.rgt AND sub_parent.user  =  sub_tree.user GROUP BY node.user HAVING depth   =  ? ORDER BY depth', [username, 1], function(err, results, fields){
+												if (err) throw err; 
+	
+	var stage4 = results;
+			//get the earnings
   				pool.query( 'SELECT * FROM earnings WHERE user= ?', [username], function ( err, results, fields ){
   					if( err ) throw err;
   					if( results.length === 0 ){
-  						var noearnings = 0;
-  						res.render( 'dashboard', {title: 'USER DASHBOARD', noearnings: noearnings });
-  										
-  					}else{
   						var earnings = {
-  							feeder: results[0].feeder,
-  							stage1: results[0].stage1,
-  							stage2: results[0].stage2,
-  							stage3: results[0].stage3,
-  							stage4: results[0].stage4,
-  							powerbank: results[0].powerbank,
-  							phone: results[0].phone,
-  							laptop: results[0].laptop,
-  							leadership: results[0].leadership,
-  							empower: results[0].empower,
-  							salary: results[0].salary
+  							feeder: 0,
+  							stage1: 0,
+  							stage2: 0,
+  							stage3: 0,
+  							stage4: 0,
+  							powerbank: 0,
+  							phone: 0,
+  							laptop: 0,
+  							leadership: 0,
+  							empower: 0,
+  							salary: 0,
+                              car: 0
   						}
-  						pool.releaseConnection(  )
-  						res.render( 'dashboard', {title: 'USER DASHBOARD', error: error, salary: earnings.salary, empower: earnings.empower, leadership: earnings.leadership, laptop: earnings.laptop, phone: earnings.phone, powerbank: earnings.powerbank, stage4: earnings.stage4, stage3: earnings.stage3, stage2: earnings.stage2, stage1: earnings.stage1, feeder: earnings.feeder });		
+  						var cash = 0;
+  						var gift = 0;
+  						var total = cash + gift;
+  					var error = 'You have not earned yet.'
+  						res.render( 'dashboard', {title: 'USER DASHBOARD', feeder: feeder, stage1: stage1, stage2: stage2, stage3: stage3, stage4: stage4, gift: gift, total: total, cash: cash, car: earnings.car, error: error, salary: earnings.salary, empower: earnings.empower, leadership: earnings.leadership, laptop: earnings.laptop, phone: earnings.phone, powerbank: earnings.powerbank, stage4: earnings.stage4, stage3: earnings.stage3, stage2: earnings.stage2, stage1: earnings.stage1, feeder: earnings.feeder });		
+  					}
+  					else{
+  						var gift = earnings.salary + earnings.powerbank + earnings.phone + earnings.car + earnings.laptop + earnings.empower + earnings.leadership;
+  						var cash  = earnings.feeder + earnings.stage1 + earnings.stage2 + earnings.stage3 + earnings.stage4;
+  						var total = cash + gift;
+  						res.render( 'dashboard', {title: 'USER DASHBOARD', feeder: feeder, stage1: stage1, stage2: stage2, stage3: stage3, stage4: stage4, gift: gift, total: total, cash: cash, car: earnings.car, salary: earnings.salary, empower: earnings.empower, leadership: earnings.leadership, laptop: earnings.laptop, phone: earnings.phone, powerbank: earnings.powerbank, stage4: earnings.stage4, stage3: earnings.stage3, stage2: earnings.stage2, stage1: earnings.stage1, feeder: earnings.feeder });		
   					}
   				});
+	});
+	
+	});
+	});
+	});
+	});
   			}
   		});
  });
