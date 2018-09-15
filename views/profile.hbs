@@ -1,4 +1,5 @@
-{{> mainh}}
+{{> spageh}}
+{{> nav}}
 {{#if errors}}
   {{#each errors}}
   <div class="alert alert-danger">
@@ -20,12 +21,9 @@
     {{success}}
   </div>
 {{/if}}
-<br><br><br>
-<div class="container"> 
-        <h4 style="text-align: center">EDIT {{title}}</h4><hr style="size: 50% color:navy"><br>
-     </div>
+
      <form method ="POST" action ="/profile">
-     
+     <br>
 		<div class="container-fluid"> 
     <div class="form-group">
     <label for="ACCOUNTname">Account Name</label>
@@ -79,4 +77,4 @@ id="password" name ="password" placeholder="Enter your password" value="" requir
     </form>
     <br><br>
     
-{{> mainf}}
+{{> spagef}}

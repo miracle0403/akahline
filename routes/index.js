@@ -228,15 +228,18 @@ pinset( );
   				res.render( 'dashboard', {title: 'DASHBOARD', error: error});
   			}
   			else{
-  			pool.query('SELECT node.user,   (COUNT(parent.user) - (sub_tree.depth + 1)) AS depth FROM feeder AS node, feeder AS parent, feeder AS sub_parent, ( SELECT node.user, (COUNT(parent.user) - 1) AS depth FROM feeder AS node, feeder AS parent WHERE node.lft BETWEEN parent.lft AND parent.rgt AND node.user = ? GROUP BY node.user ORDER BY node.lft) AS sub_tree WHERE node.lft BETWEEN parent.lft AND parent.rgt AND node.lft BETWEEN sub_parent.lft AND sub_parent.rgt AND sub_parent.user = sub_tree.user GROUP BY node.user HAVING depth  = ? ORDER BY depth', [username, 1], function(err, results, fields){
+  			pool.query('SELECT node.user,   (COUNT(parent.user) - (sub_tree.depth + 1)) AS depth FROM feeder AS node, feeder AS parent, feeder AS sub_parent, ( SELECT node.user, (COUNT(parent.user) - 1) AS depth FROM feeder AS node, feeder AS parent WHERE node.lft BETWEEN parent.lft AND parent.rgt AND node.user = ? GROUP BY node.user ORDER BY node.lft) AS sub_tree WHERE node.lft BETWEEN parent.lft AND parent.rgt AND node.lft BETWEEN sub_parent.lft AND sub_parent.rgt AND sub_parent.user  =  sub_tree.user GROUP BY node.user HAVING depth   = ? ORDER BY depth ', [username, 4], function(err, results, fields){
 												if (err) throw err; 
 	
 	var feeder = results;
+	console.log( feeder );
+	
 	pool.query('SELECT node.user,   (COUNT(parent.user) - (sub_tree.depth + 1)) AS depth FROM stage1 AS node, stage1 AS parent, stage1 AS sub_parent, ( SELECT node.user, (COUNT(parent.user) - 1) AS depth FROM stage1 AS node, stage1 AS parent WHERE node.lft BETWEEN parent.lft AND parent.rgt AND node.user = ? GROUP BY node.user ORDER BY node.lft) AS sub_tree WHERE node.lft BETWEEN parent.lft AND parent.rgt AND node.lft BETWEEN sub_parent.lft AND sub_parent.rgt AND sub_parent.user  =  sub_tree.user GROUP BY node.user HAVING depth  < ? ORDER BY depth', [username, 3], function(err, results, fields){
 												if (err) throw err; 
 	
 	var stage1 = results;
-	pool.query('SELECT node.user,   (COUNT(parent.user) - (sub_tree.depth + 1)) AS depth FROM stage2 AS node, stage2 AS parent, stage2 AS sub_parent, ( SELECT node.user, (COUNT(parent.user) - 1) AS depth FROM stage2 AS node, stage2 AS parent WHERE node.lft BETWEEN parent.lft AND parent.rgt AND node.user = ? GROUP BY node.user ORDER BY node.lft) AS sub_tree WHERE node.lft BETWEEN parent.lft AND parent.rgt AND node.lft BETWEEN sub_parent.lft AND sub_parent.rgt AND sub_parent.user  =  sub_tree.user GROUP BY node.user HAVING depth   = ? ORDER BY depth', [username, 1], function(err, results, fields){
+	console.log( stage1 );
+	pool.query('SELECT node.user,   (COUNT(parent.user) - (sub_tree.depth + 1)) AS depth FROM stage2 AS node, stage2 AS parent, stage2 AS sub_parent, ( SELECT node.user, (COUNT(parent.user) - 1) AS depth FROM stage2 AS node, stage2 AS parent WHERE node.lft BETWEEN parent.lft AND parent.rgt AND node.user = ? GROUP BY node.user ORDER BY node.lft) AS sub_tree WHERE node.lft BETWEEN parent.lft AND parent.rgt AND node.lft BETWEEN sub_parent.lft AND sub_parent.rgt AND sub_parent.user  =  sub_tree.user GROUP BY node.user HAVING depth   = ? ORDER BY depth', [username, 4], function(err, results, fields){
 												if (err) throw err; 
 	
 	var stage2 = results;
@@ -270,7 +273,7 @@ pinset( );
   						var gift = 0;
   						var total = cash + gift;
   					var error = 'You have not earned yet.'
-  						res.render( 'dashboard', {title: 'USER DASHBOARD', feeder: feeder, stage1: stage1, stage2: stage2, stage3: stage3, stage4: stage4, gift: gift, total: total, cash: cash, car: earnings.car, error: error, salary: earnings.salary, empower: earnings.empower, leadership: earnings.leadership, laptop: earnings.laptop, phone: earnings.phone, powerbank: earnings.powerbank, stage4: earnings.stage4, stage3: earnings.stage3, stage2: earnings.stage2, stage1: earnings.stage1, feeder: earnings.feeder });		
+  						res.render( 'dashboard', {title: 'USER DASHBOARD', feedertree: feeder, stage1tree: stage1, stage2tree: stage2, stage3tree: stage3, stage4tree: stage4, gift: gift, total: total, cash: cash, car: earnings.car, error: error, salary: earnings.salary, empower: earnings.empower, leadership: earnings.leadership, laptop: earnings.laptop, phone: earnings.phone, powerbank: earnings.powerbank, stage4: earnings.stage4, stage3: earnings.stage3, stage2: earnings.stage2, stage1: earnings.stage1, feeder: earnings.feeder });		
   					}
   					else{
   						var gift = earnings.salary + earnings.powerbank + earnings.phone + earnings.car + earnings.laptop + earnings.empower + earnings.leadership;
@@ -466,8 +469,6 @@ connection.query('SELECT username FROM user WHERE username = ?', [username], fun
            		 					res.render('register', {title: 'REGISTRATION UNSUSSESSFUL!', error: error});
            		 					}else{
            		 						//update the pin
-              							connection.query('UPDATE pin SET user = ? WHERE serial = ?', [username, serial], function(err, results,fields){
-                							if (err) throw err;
                 						//console.log(results);
                 							//check if the sponsor is valid
                 							connection.query('SELECT username, full_name, email FROM user WHERE username = ?', [sponsor], function(err, results, fields){
@@ -477,6 +478,8 @@ connection.query('SELECT username FROM user WHERE username = ?', [username], fun
       											res.render('register', {error: error, title: 'REGISTRATION UNSUCCESSCUL!'})
       										}
       										else{
+      										connection.query('UPDATE pin SET user = ? WHERE serial = ?', [username, serial], function(err, results,fields){
+                							if (err) throw err;
       											//hash password and insert user in the database
       												bcrypt.hash(password, saltRounds, null, function(err, hash){
                   								connection.query( 'CALL register(?, ?, ?, ?, ?, ?, ?, ?, ?)', [sponsor, fullname, phone, code, username, email, hash, 'active', 'no'], function(err, result, fields){
@@ -537,7 +540,7 @@ connection.query('SELECT username FROM user WHERE username = ?', [username], fun
 			//if d is null
 			if(first.a !== null && first.b !== null && first.c !== null && first.d === null){
 				//call the feeder amount
-				connection.query('CALL feederAmount(?)', [user], function(err, results, fields){
+				connection.query('CALL feederAmount(?)', [username], function(err, results, fields){
 					if (err) throw err;
 				 //update into the sponsor set
 				 	connection.query('UPDATE feeder_tree SET d = ? WHERE user = ?', [username, user], function(err, results, fields){
@@ -1386,8 +1389,8 @@ connection.query('SELECT username FROM user WHERE username = ?', [username], fun
                     							
               									});
               								});
-      										}
       										});
+      										}
                 						  });
            		 					}
            		 				});

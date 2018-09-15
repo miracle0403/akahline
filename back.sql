@@ -7,7 +7,7 @@ UPDATE user_tree SET stage1 = "yes" WHERE user = user;
 END //
 DELIMITER ;
 
-CREATE TABLE pin( user VARCHAR(255) UNIQUE, serial text NOT NULL, pin varchar( 255 ) NOT NULL, date DATETIME  DEFAULT CURRENT_TIMESTAMP);
+CREATE TABLE pin( u VARCHAR(255) UNIQUE, serial text NOT NULL, pin varchar( 255 ) NOT NULL, date DATETIME  DEFAULT CURRENT_TIMESTAMP);
 
 CREATE TABLE reset( user VARCHAR( 255 ) NOT NULL, status text, code int( 11 ) not null, date DATETIME  DEFAULT CURRENT_TIMESTAMP);
 				
@@ -59,6 +59,27 @@ CREATE TABLE `feeder` (
 	`rgt` INT(11) NOT NULL
 );
 
+CREATE TABLE `stage2` (
+	`user` VARCHAR(255)NOT NULL,
+	`amount` INT(11) NOT NULL,
+	`lft` INT(11) NOT NULL,
+	`rgt` INT(11) NOT NULL
+);
+
+CREATE TABLE `stage3` (
+	`user` VARCHAR(255)NOT NULL,
+	`amount` INT(11) NOT NULL,
+	`lft` INT(11) NOT NULL,
+	`rgt` INT(11) NOT NULL
+);
+
+CREATE TABLE `stage4` (
+	`user` VARCHAR(255)NOT NULL,
+	`amount` INT(11) NOT NULL,
+	`lft` INT(11) NOT NULL,
+	`rgt` INT(11) NOT NULL
+);
+
 CREATE TABLE `stage1` (
 	`user` VARCHAR(255)NOT NULL,
 	`amount` INT(11) NOT NULL,
@@ -91,7 +112,7 @@ CREATE TABLE `earnings` (
 	`stage1` INT(11) UNSIGNED ZEROFILL NOT NULL,
 	`stage2` INT(11) UNSIGNED ZEROFILL NOT NULL,
 	`stage3` INT(11) UNSIGNED ZEROFILL NOT NULL,
-		`stage4` INT(11) UNSIGNED ZEROFILL NOT NULL,
+	`stage4` INT(11) UNSIGNED ZEROFILL NOT NULL,
 	`powerbank` INT(11) UNSIGNED ZEROFILL NOT NULL,
 	`phone` INT(11) UNSIGNED ZEROFILL NOT NULL,
 	`laptop` INT(11) UNSIGNED ZEROFILL NOT NULL,
@@ -99,13 +120,10 @@ CREATE TABLE `earnings` (
 	`empower` INT(11) UNSIGNED ZEROFILL NOT NULL,
 	`salary` INT(11) UNSIGNED ZEROFILL NOT NULL,
 	`car` INT(11) UNSIGNED ZEROFILL NOT NULL
-)
-COLLATE='latin1_swedish_ci'
-ENGINE=InnoDB
-;
+);
 
 drop table user;
-CREATE TABLE user( user_id INT( 11 ) UNIQUE PRIMARY KEY AUTO_INCREMENT NOT NULL, sponsor text,  username varchar( 255 ) UNIQUE NOT NULL, full_name varchar ( 255 ) NOT NULL, verification text, status text, email varchar ( 255 ) UNIQUE NOT NULL, phone VARCHAR(255) NOT NULL, code INT( 11 ) NOT NULL, password varchar( 255 ) NOT NULL, paid varchar( 255 ),date DATETIME DEFAULT CURRENT_TIMESTAMP )	;
+CREATE TABLE user( user_id INT( 11 ) UNIQUE PRIMARY KEY AUTO_INCREMENT NOT NULL, sponsor text,  username varchar( 255 ) UNIQUE NOT NULL, full_name varchar ( 255 ) NOT NULL, verification text, status text, email varchar ( 255 ) UNIQUE NOT NULL, phone VARCHAR(255) NOT NULL, code INT( 11 ) NOT NULL, password varchar( 255 ) NOT NULL, paid varchar( 255 ),date DATETIME  )	;
 
 CREATE TABLE `profile` (
 	`user` VARCHAR (255) NOT NULL,
@@ -152,12 +170,12 @@ CREATE PROCEDURE stage1in(sponsor INT(11), mother INT(11), child INT(11))
 BEGIN
 SELECT @myLeft := lft FROM stage1 WHERE user = mother;
 INSERT INTO stage1_tree (sponsor, user) VALUES (sponsor, child);
-UPDATE sttage1 SET rgt = rgt + 2 WHERE rgt > @myLeft;
+UPDATE stage1 SET rgt = rgt + 2 WHERE rgt > @myLeft;
 UPDATE stage1 SET lft = lft + 2 WHERE lft > @myLeft;
 UPDATE stage1 SET amount = amount + 1 WHERE user = mother;
 UPDATE user_tree SET stage1 =  'yes' WHERE user = child;
 
-INSERT INTO stage1(user, lft, rgt) VALUES(child, @myLeft + 1, @myLeft + 2);
+INSERT INTO stage1(user, lft, rgt, amount) VALUES(child, @myLeft + 1, @myLeft + 2, 0);
 
 END //
 DELIMITER ;
