@@ -1,13 +1,15 @@
 DELIMITER //
 CREATE PROCEDURE feederAmount (user VARCHAR(255))
 BEGIN
-INSERT INTO earnings (user, amount) VALUES (user, 6000);
+INSERT INTO earnings (user, feeder, stage1, stage2, stage3, stage4, car, powerbank, phone, salary, laptop, empower, leadership) VALUES (user, 6000, 0, 0,0,0,0,0,0,0,0,0,0);
 UPDATE user_tree SET stage1 = "yes" WHERE user = user;
+INSERT INTO stage1(user, lft, rgt, amount) VALUES(user, @myLeft + 1, @myLeft + 2, 0);
+INSERT INTO stage1_tree ( user) VALUES ( user);
 
 END //
 DELIMITER ;
 
-CREATE TABLE pin( u VARCHAR(255) UNIQUE, serial text NOT NULL, pin varchar( 255 ) NOT NULL, date DATETIME  DEFAULT CURRENT_TIMESTAMP);
+CREATE TABLE pin( user VARCHAR(255) UNIQUE, serial text NOT NULL, pin varchar( 255 ) NOT NULL, date DATETIME  DEFAULT CURRENT_TIMESTAMP);
 
 CREATE TABLE reset( user VARCHAR( 255 ) NOT NULL, status text, code int( 11 ) not null, date DATETIME  DEFAULT CURRENT_TIMESTAMP);
 				
@@ -25,7 +27,6 @@ ENGINE=InnoDB
 ;
 CREATE TABLE `stage1_tree` (
 	`matrix_id` INT(11) UNIQUE PRIMARY KEY AUTO_INCREMENT NOT NULL,
-	`sponsor` VARCHAR(255) NOT NULL,
 	`user` VARCHAR(255) NOT NULL,
 	`a` VARCHAR(255) NULL DEFAULT NULL,
 	`b` VARCHAR(255) NULL DEFAULT NULL,
@@ -88,7 +89,7 @@ CREATE TABLE `stage1` (
 );
 
 DELIMITER //
-CREATE PROCEDURE leafadd(sponsor VARCHAR(255), mother VARCHAR(255), child VARCHAR(255))
+CREATE PROCEDURE leafadd(sponsor VARCHAR(255), mother VARCHAR(255), child VARCHAR(255),serial VARCHAR(255))
 BEGIN
 
 SELECT @myLeft := lft FROM feeder WHERE user = mother;
@@ -108,18 +109,18 @@ DELIMITER ;
 
 CREATE TABLE `earnings` (
 	`user` VARCHAR(255) NOT NULL,
-	`feeder` INT(11) UNSIGNED ZEROFILL NOT NULL,
-	`stage1` INT(11) UNSIGNED ZEROFILL NOT NULL,
-	`stage2` INT(11) UNSIGNED ZEROFILL NOT NULL,
-	`stage3` INT(11) UNSIGNED ZEROFILL NOT NULL,
-	`stage4` INT(11) UNSIGNED ZEROFILL NOT NULL,
-	`powerbank` INT(11) UNSIGNED ZEROFILL NOT NULL,
-	`phone` INT(11) UNSIGNED ZEROFILL NOT NULL,
-	`laptop` INT(11) UNSIGNED ZEROFILL NOT NULL,
-	`leadership` INT(11) UNSIGNED ZEROFILL NOT NULL,
-	`empower` INT(11) UNSIGNED ZEROFILL NOT NULL,
-	`salary` INT(11) UNSIGNED ZEROFILL NOT NULL,
-	`car` INT(11) UNSIGNED ZEROFILL NOT NULL
+	`feeder` INT(11) NOT NULL,
+	`stage1` INT(11) NOT NULL,
+	`stage2` INT(11)  NOT NULL,
+	`stage3` INT(11) NOT NULL,
+	`stage4` INT(11) NOT NULL,
+	`powerbank` INT(11) NOT NULL,
+	`phone` INT(11) NOT NULL,
+	`laptop` INT(11) NOT NULL,
+	`leadership` INT(11) NOT NULL,
+	`empower` INT(11) NOT NULL,
+	`salary` INT(11) NOT NULL,
+	`car` INT(11) NOT NULL
 );
 
 drop table user;
@@ -148,12 +149,13 @@ UPDATE user_tree SET lft = lft + 2 WHERE lft > @myLeft;
 INSERT INTO user_tree(user, rgt, lft) VALUES(username, @myLeft + 2, @myLeft + 1);
 
 INSERT INTO user (sponsor, full_name, phone, code, username, email, password, status, verification) VALUES ( sponsor, full_name, phone,code, username, email, password, 'active', 'no');
+UPDATE pin SET user = child WHERE serial = serial;
 
 END//
 DELIMITER ;
 
 CREATE TABLE `user_tree` (
-	`sponsor` VARCHAR(255) NOT NULL,
+	
 	`user` VARCHAR(255) NOT NULL,
 	`lft` INT(11) NOT NULL,
 	`rgt` INT(11) NOT NULL,
@@ -166,16 +168,13 @@ CREATE TABLE `user_tree` (
 );
 
 DELIMITER //
-CREATE PROCEDURE stage1in(sponsor INT(11), mother INT(11), child INT(11))
+CREATE PROCEDURE stage1in( mother VARCHAR(255), child VARCHAR(255))
 BEGIN
 SELECT @myLeft := lft FROM stage1 WHERE user = mother;
-INSERT INTO stage1_tree (sponsor, user) VALUES (sponsor, child);
 UPDATE stage1 SET rgt = rgt + 2 WHERE rgt > @myLeft;
 UPDATE stage1 SET lft = lft + 2 WHERE lft > @myLeft;
 UPDATE stage1 SET amount = amount + 1 WHERE user = mother;
-UPDATE user_tree SET stage1 =  'yes' WHERE user = child;
 
-INSERT INTO stage1(user, lft, rgt, amount) VALUES(child, @myLeft + 1, @myLeft + 2, 0);
 
 END //
 DELIMITER ;

@@ -1,4 +1,4 @@
-var mysql = require ('mysql2');
+var mysql = require ('mysql');
 var server = require ('./app.js');
 
 var pool  = mysql.createPool({
@@ -15,10 +15,11 @@ pool.getConnection( function ( err, con ){
 		console.log( 'no connection to pool' )
 	}
 	else{
-		con.query( 'SELECT username FROM user', function ( err, results, fields ){
+		con.query( 'SELECT 1 + 4 AS solution', function ( err, results, fields ){
 			if ( err ) throw err;
 			else{
-			console.log( results[0]);
+			console.log( 'solution is ' + results[0]);
+			console.log( 'i am collins love' );
 			pool.releaseConnection( con );
 			}
 		});

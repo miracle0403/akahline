@@ -1,6 +1,7 @@
 'use strict'; 
 var env  = require('dotenv').config();
 const nodemailer = require('nodemailer');
+var events = require( 'events' )
 //const Sequelize = require('sequelize');
 var createError = require('http-errors');
 var express = require('express');
@@ -9,7 +10,7 @@ var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 var bodyParser = require('body-parser');
 var expressValidator = require('express-validator');
-var mysql = require('mysql2');
+var mysql = require('mysql');
 var myConnection = require('express-myconnection'); // express-myconnection module 
 var hbs = require('hbs');
 var fs = require('fs');
@@ -28,7 +29,7 @@ var usersRouter = require('./routes/users');
 var db = require('./db.js');
 
 var app = express();
-
+//emitter.setMaxListeners(0);
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'hbs');

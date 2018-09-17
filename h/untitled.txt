@@ -1,0 +1,147 @@
+      <div class ="container-fluid">
+       
+      <div class="card-deck">
+       <div class="card"> 
+ <div class="card-header">
+  MY EARNINGS SUMMARY 
+  </div>
+        <div class="card-body"> 
+        <h5 class="card-title">TOTAL EARNED</h5> 
+        <p class="card-text"><big><b>CASH: {{cash}}</big></b></p> 
+        <p class="card-text"> <big><b>GIFT: {{gift}}</big></b></p> 
+        <p class="card-text"> <big><b>TOTAL EARNED: {{total}}</big></b></p> 
+        </div> 
+        <div class="card-footer"> 
+        <small class="text-muted">Updated Now</small> 
+        </div> 
+        </div> 
+        <div class="card">  
+        <div class="card-header">
+  MY WALLET
+  </div>
+   <div class="card-body"> 
+     <h5 class="card-title">FEEDER</h5> <p class="card-text">{{feeder}}</p> <br>
+         <h5 class="card-title">STAGE ONE</h5> <p class="card-text">{{stage1}}</p> <br>
+            <h5 class="card-title">STAGE TWO</h5> <p class="card-text">{{stage2}}</p> 
+             <h5 class="card-title">STAGE THREE</h5> <p class="card-text">{{stage3}}</p> <br>
+              <h5 class="card-title">STAGE FOUR</h5> <p class="card-text">{{stage4}}</p> <br>
+             
+              <form method ="POST" action ="/withdraw">
+              <div class="form-group">
+              <button type="submit" class="btn btn-primary">WITHDRAW FUNDS</button>
+              </div>
+	  </form>
+    </div> 
+    <div class="card-footer"> 
+    <small class="text-muted">Updated Now</small>
+     </div>
+      </div> 
+      <div class="card"> 
+      <div class="card-header">
+  MY GIFTS 
+  </div>
+      <div class="card-body"> 
+         <h5 class="card-title">STAGE ONE</h5> <p class="card-text">POWER BANK: {{powerbank}}</p>
+            <h5 class="card-title">STAGE TWO</h5> <p class="card-text">PHONE : {{phone}}</p> 
+             <h5 class="card-title">STAGE THREE</h5> <p class="card-text">LAPTOP: {{laptop}}</p> 
+              <h5 class="card-title">STAGE FOUR</h5> <p class="card-text">CAR: {{car}}</p>
+              <p class="card-text">EMPOWERMENT: {{empowerment}}</p> 
+              <p class="card-text">LEADERSHIP BONUS: {{leadership}}</p> 
+              <p class="card-text">SALARY{{salary}}</p> 
+      </div> 
+      <div class="card-footer">
+       <small class="text-muted">Updated Now</small> 
+       </div> 
+       </div> 
+       </div>
+       
+       <!-- end of the first side-->
+       
+       <br><br><br>
+        <div class="card-deck">
+       <div class="card"> 
+ <div class="card-header">
+  FEEDER LEG 
+  </div>
+        <div class="card-body"> 
+        <h5 class="card-title">Your Leg</h5> 
+        
+        {{#each feeder}}
+           <p>{{user}}</p>
+        {{/each}}
+        
+        
+        </div> 
+        <div class="card-footer"> 
+        <small class="text-muted">see their details here <a href="/referrals">here</a></small> 
+        </div> 
+        </div> 
+        <div class="card">  
+        <div class="card-header">
+  STAGE ONE LEG
+  </div>
+   <div class="card-body"> 
+    <h5 class="card-title">YOUR LEG</h5> 
+    {{#if stage1}}
+        {{#each stage1}}
+           <p>{{user}}</p>
+        {{/each}}
+        {{/if}}
+    </div> 
+    <div class="card-footer"> 
+    <small class="text-muted">see their details here <a href="/referrals">here</a></small>
+     </div>
+      </div> 
+      <div class="card">  
+        <div class="card-header">
+  STAGE TWO LEG
+  </div>
+   <div class="card-body"> 
+     <h5 class="card-title">YOUR LEG</h5> 
+      {{#if stage2}}
+        {{#each stage2}}
+           <p>{{user}}</p>
+        {{/each}}
+        {{/if}}
+    </div> 
+    <div class="card-footer"> 
+    <small class="text-muted">see their details here <a href="/referrals">here</a></small>
+     </div>
+      </div> 
+         <div class="card">  
+        <div class="card-header">
+  STAGE THREE LEG
+  </div>
+   <div class="card-body"> 
+     <h5 class="card-title">YOUR LEG</h5> 
+        {{#if stage3}}
+        {{#each stage3}}
+           <p>{{user}}</p>
+        {{/each}}
+        {{/if}}
+    </div> 
+    <div class="card-footer"> 
+    <small class="text-muted">see their details here <a href="/referrals">here</a></small>
+     </div>
+      </div> 
+      <div class="card"> 
+      <div class="card-header">
+  STAGE FOUR LEG
+  </div>
+      <div class="card-body"> 
+     <h5 class="card-title">YOUR LEG</h5> 
+      {{#if stage4}}
+        {{#each stage4}}
+           <p>{{user}}</p>
+        {{/each}}
+        {{/if}}
+      </div> 
+      <div class="card-footer">
+       <small class="text-muted">see their details here <a href="/referrals">here</a></small> 
+       </div> 
+       </div> 
+       </div>
+       <!-- end of the second side-->
+       
+      </div>
+                       <hr>
