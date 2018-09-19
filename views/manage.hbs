@@ -1,2 +1,288 @@
-{{> mainh}}
-{{> mainf}}
+{{> spageh}}
+{{> nav}}
+{{#if error}}
+	<div class="alert alert-danger">
+    {{error}} 
+  </div>
+{{/if}}
+{{#if success}}
+	<div class="alert alert-success">
+    {{success}} 
+  </div>
+{{/if}}
+<div class="content">
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-lg-3 col-sm-6">
+                        <div class="card">
+                            <div class="content">
+                                <div class="row">
+                                    <div class="col-xs-5">
+                                        <div class="icon-big icon-warning text-center">
+                                            <i class="ti-user"></i>
+                                        </div>
+                                    </div>
+                                    <div class="col-xs-7">
+                                        <div class="numbers">
+                                            <p><b>Total Admins</b></p>
+                                            You have a total of {{count}} administrators.
+                                            	   <form method ="POST" action ="/addadmin">
+                                            	    <div class="form-group">
+        <label for="username">username</label>
+    <input type="text" class="form-control" 
+id="username" name ="username" placeholder="Enter username" required />
+</div>
+    	<div class="form-group"> <button type="submit" class="btn 
+btn-primary">Submit</button>
+                                            	   </form>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="footer">
+                                    <hr />
+                                    <div class="stats">
+                                        <i class="ti-reload"></i> Updated now
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-3 col-sm-6">
+                        <div class="card">
+                            <div class="content">
+                                <div class="row">
+                                    <div class="col-xs-5">
+                                        <div class="icon-big icon-success text-center">
+                                            <i class="ti-user"></i>
+                                        </div>
+                                    </div>
+                                    <div class="col-xs-7">
+                                        <div class="numbers">
+                                            <p><b>USERS STATS</b></p>
+                                            <p>Total Users: {{totalUsers}}</p>
+                                            <p>Feeder Users: {{feederUsers}}</p>
+                                             <p>Stage One Users: {{stage1Users}}</p>
+                                             <p>Stage Two Users: {{stage2Users}}</p>
+                                             <p>Stage Three Users: {{stage3Users}}</p>
+                                             <p>Stage Four Users: {{stage4Users}}</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="footer">
+                                    <hr />
+                                    <div class="stats">
+                                        <i class="ti-calendar"></i> Updated Now
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-3 col-sm-6">
+                        <div class="card">
+                            <div class="content">
+                                <div class="row">
+                                    <div class="col-xs-5">
+                                        <div class="icon-big icon-info text-center">
+                                            <i class="ti-wallet"></i>
+                                        </div>
+                                    </div>
+                                    <div class="col-xs-7">
+                                        <div class="numbers">
+                                            <p><b>WALLET STATS</b></p>
+                                            
+                                            <p>Total Earnings: {{totalCash}}</p>
+                                            <p>Feeder Earnings: {{feeder}}</p>
+                                             <p>Stage One Earnings: {{stage1}}</p>
+                                             <p>Stage Two Earnings: {{stage2}}</p>
+                                             <p>Stage Three Earnings: {{stage3}}</p>
+                                             <p>Stage Four Earnings: {{stage4}}</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="footer">
+                                    <hr />
+                                    <div class="stats">
+                                        <i class="ti-timer"></i> In the last hour
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-3 col-sm-6">
+                        <div class="card">
+                            <div class="content">
+                                <div class="row">
+                                    <div class="col-xs-5">
+                                        <div class="icon-big icon-danger text-center">
+                                            <i class="ti-gift"></i>
+                                        </div>
+                                    </div>
+                                    <div class="col-xs-7">
+                                        <div class="numbers">
+                                            <p><b>GIFTS STATS</b></p>
+                                            <p>Total Users: {{totalgift}}</p>
+                                            
+                                             <p>Stage One Users: {{powerbank}}</p>
+                                             <p>Stage Two Users: {{phone}}</p>
+                                             <p>Stage Three Users: {{laptop}}</p>
+                                             <p>Stage Four Users: {{stage4gift}}</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="footer">
+                                    <hr />
+                                    <div class="stats">
+                                        <i class="ti-reload"></i> Updated now
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- end of that section.. time to reveal all the users details -->
+                <div class="content">
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="card">
+                            <div class="header">
+                                <h4 class="title">All Users</h4>
+                                
+                            </div>
+                            <div class="content table-responsive table-full-width">
+                                <table class="table table-striped">
+                                    <thead>
+                                   <th>User_id</th>     <th>Username</th>
+                                    	<th>Name</th>
+                                    	<th>Email</th>
+                                    	<th>Phone</th>
+                                    	<th>Date Joined</th>
+                                    </thead>
+                                    <tbody>
+                                    {{#each users}}
+                                    <tr>
+                                        	<td>{{user_id}}</td>
+                                        	<td>{{username}}</td>
+                                        	<td>{{full_name}}</td>
+                                        	<td>{{email}}</td>
+                                        	<td>{{code}}{{phone]}</td>
+                                        	<td>{{date_joined}}</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+
+                            </div>
+                            <form method ="POST" action ="/sendmail">
+                                            	    <div class="form-group">
+        <label for="message">MESSAGE</label>
+    <div class="form-group">
+                                                
+                                                <textarea rows="10" class="form-control border-input" placeholder="Type the mail to be sent here" name ="mail"value=""></textarea>
+                                            </div>
+    	<div class="form-group"> <button type="submit" class="btn 
+btn-primary">Send Mail</button>
+                                            	   </form>
+                                    
+                        </div>
+                    </div>
+                    </div>
+            </div>
+        </div>
+                    
+                        <!-- end of all users... now check individual earnings-->            
+                        <div class="col-md-12">
+                        <div class="card card-plain">
+                            <div class="header">
+                                <h4 class="title">Users Transaction</h4>
+                                <p class="category">Here is a subtitle for this table</p>
+                            </div>
+                            <div class="content table-responsive table-full-width">
+                                 
+                                <table class="table table-hover">
+                                
+                                    <thead>
+                                        <th>Transaction Id</th>
+                                    	<th>User</th>
+                                    	<th>Balance b/f</th>
+                                    	<th>Credit</th>
+                                    	<th>Description</th>
+                                    	<th>Debit</th>
+                                    	 <th>Debit Receipt Number</th>
+                                    	 <th>Balance</th>
+                                    	 <th>Date</th>
+                                    </thead>
+                                    <tbody>
+                                     {{#if transactions}}
+                                  {{#each transactions}}
+                                        <tr>
+                                        	<td>{{id}}</td>
+                                        	<td>{{Username}}</td>
+                                        	<td>{{balance_b/f}}</td>
+                                        	<td>{{credit}}</td>
+                                        	<td>{{description}}</td>
+                                        	<td>{{debit}}</td>
+                                        	<td>{{debit_receipt}}</td>
+                                        	<td>{{date}}</td>
+                                       
+                              
+                                        </tr>
+                                              {{/each}}
+                                              {{/if}}
+                                    </tbody>
+                                </table>
+
+                            </div>
+                            <form method ="POST" action ="/searchtransaction">
+                                            	    <div class="form-group">
+        <label for="username">username</label>
+    <input type="text" class="form-control" 
+id="username" name ="username" placeholder="Enter username" required />
+</div>
+    	<div class="form-group"> <button type="submit" class="btn 
+btn-primary">Search</button></div>
+                                            	   </form>
+                                            	         <form method ="POST" action ="/debit">
+                                            	    <div class="form-group">
+        <label for="username">Username</label>
+    <input type="text" class="form-control" 
+id="username" name ="username" placeholder="Enter username" required />
+</div>
+<div class="form-group">
+        <label for="amount">Amount</label>
+    <input type="number" class="form-control" 
+id="amount" name ="amount" placeholder="Enter amount" required />
+</div>
+    <div class="form-group">
+        <label for="teller">Debit Receipt Number</label>
+    <input type="text" class="form-control" 
+id="debit" name ="debit" placeholder="Enter receipt number" required />
+</div>
+    <div class="form-group">
+        <label for="description">Debit Receipt Number</label>
+        <select name="funds" class="form-control" value="Select The fund" id="funds">
+    <option></option>
+    <option>Feeder Cash</option>
+    <option>Stage 1</option>
+    <option>Stage 2</option>
+   <option>Stage 3</option>
+    <option>Stage 4</option>
+      <option>Power Bank</option>
+      <option>Phone</option>
+           <option>laptop</option>
+                <option>empower</option>
+                     <option>Leadership</option>
+                          <option>Salary</option>
+  </select>
+    	<div class="form-group"> <button type="submit" class="btn 
+btn-primary">Debit User</button></div>
+                                            	   </form>
+                                        </div>
+                        </div>
+                    </div>
+
+
+                </div>
+            </div>
+        </div>
+{{> spagef}}

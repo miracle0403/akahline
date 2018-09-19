@@ -1,6 +1,7 @@
 'use strict';
 const nodemailer = require('nodemailer');
 //var resete = require('../nodemailer/passwordreset.js');
+var matrix = require( '../functions/normal.js' );
 var reset = require('../functions/mailfunctions.js');
 var fillup = require('../functions/withsponsor.js');
 var timer = require( '../functions/datefunctions.js' );
@@ -21,14 +22,17 @@ function rounds( err, results ){
 }
 const saltRounds = bcrypt.genSalt( 10, rounds);
 
-function restrict( ){
-	db.query( 'SELECT user_id FROM admin WHERE user_id  = ?', [currentUser], function ( err, results, fields ){ 
+/*function restrict(x){
+	db.query( 'SELECT user FROM admin WHERE user  = ?', [x], function ( err, results, fields ){ 
 		if( err ) throw err;
 		if( results.length === 0 ){
 			res.redirect( 'dashboard' )
 		}
+		else{
+			res.render( 'manage' );
+		}
 	});
-}
+}*/
 
 var pool  = mysql.createPool({
   connectionLimit : 100,
@@ -116,8 +120,82 @@ router.get('/passwordreset',  function (req, res, next){
   res.render('passwordreset', {title: "PASSWORD RESET"});
 });
 // get verification
-router.get('/manage',  function (req, res, next){
-  res.render('manage', {title: "MANAGE USERS"});
+router.get('/manage', authentificationMiddleware(), function (req, res, next){
+	  var currentUser = req.session.passport.user.user_id
+	  db.query( 'SELECT user FROM admin WHERE user  = ?', [currentUser], function ( err, results, fields ){ 
+			if( err ) throw err;
+			if( results.length === 0 ){
+				res.redirect( 'dashboard' )
+			}
+			else{
+			//earnings sum
+			db.query( 'SELECT SUM(feeder), SUM(stage1),SUM(stage2), SUM(stage3), SUM(stage4), SUM(powerbank), SUM(phone), SUM(laptop), SUM(car), SUM(empower), SUM(leadership), SUM(salary) FROM earnings', function ( err, results, fields ){
+			var earnings = {
+				feeder: results[0].feeder,
+				stage1: results[0].stage1,
+				stage2: results[0].stage2,
+				stage3: results[0].stage3,
+				stage4: results[0].stage4,
+				powerbank: results[0].powerbank,
+				phone: results[0].phone,
+				laptop: results[0].laptop,
+				car: results[0].car,
+				leadership: results[0].leadership,
+				salary: results[0].salary,
+				empower: results[0].empower
+			}
+			var totalgift = earnings.phone + eanings.powerbank + earnings.car + earnings.empower + earnjngs.salary + earnings.leadership;
+			var totalcash  = earnings.feeder + earnings.stage1 + earnings.stage2 + earnings.stage3 + earnings.stage4;
+			var stage4gifts = earnings.car + earnings.empower + earnjngs.salary + earnings.leadership;
+			//stage2
+			db.query( 'SELECT COUNT(user) FROM stage2_tree', function ( err, results, fields ){
+				  if(err) throw err;
+				  var stage2Count = results[0];
+				  console.log( 'stage 2 count is...' )
+				  console.log( stage2Count );
+			//stage3
+			db.query( 'SELECT COUNT(user) FROM stage3_tree', function ( err, results, fields ){
+				  if(err) throw err;
+				  var stage3Count = results[0];
+			//stage 4
+			db.query( 'SELECT COUNT(user) FROM stage4_tree', function ( err, results, fields ){
+				  if(err) throw err;
+				  var stage4Count = results[0];
+			//select count stage 1
+			db.query( 'SELECT COUNT(user) FROM stage1_tree', function ( err, results, fields ){
+				  if(err) throw err;
+				  var stage1Count = results[0];
+			//select count of feeder
+			db.query( 'SELECT COUNT(user) FROM feeder_tree', function ( err, results, fields ){
+				  if(err) throw err;
+				  var feederCount = results[0];
+			//count number of users
+			db.query( 'SELECT COUNT(username) FROM user', function ( err, results, fields ){
+				  if(err) throw err;
+				  var userCount = results[0];
+			  //select count to know the number of users in the admin table.
+			  db.query( 'SELECT COUNT(user) FROM admin', function ( err, results, fields ){
+				  if(err) throw err;
+				  var adminCount = results[0];
+				  //get all users
+				  db.query( 'SELECT * FROM user', function ( err, results, fields ){
+					  if(err) throw err
+					  var users = results;
+					  //loop to get the emails
+					  
+					  	res.render('manage', {title: "MANAGE USERS", feederUsers: feederCount, totalUsers: userCount, stage1Users: stage1Count, car: earnings.car, salary: earnings.salary, empower: earnings.empower, leadership: earnings.leadership, stage4gift: stage4gifts, laptop: earnings.laptop, phone: earnings.phone, powerbank: earnings.powerbank, stage4: earnings.stage4, stage3: earnings.stage3, stage2: earnings.stage2, stage1: earnings.stage1, feeder: earnings.feeder, stage2Users: stage2Count, stage3Users: stage3Count, totalgift: totalgift, stage4Users: stage4Count, totalCash: totalcash, users: users, count: adminCount});
+					  
+				 });
+			  });
+			  });
+			  });
+			  });
+			  });
+			  }); 
+			  });
+			  });
+			}
+ 	});
 });
 
 
@@ -228,6 +306,25 @@ pinset( );
   				res.render( 'dashboard', {title: 'DASHBOARD', error: error});
   			}
   			else{
+  			pool.query( 'SELECT feeder, stage1, stage2, stage3, stage4 FROM user WHERE user = ?', [username], function ( err, results, fields ){
+  			if( err ) throw err;
+  			var stage = {
+  				feeder: results[0].feeder,
+  				stage1: results[0].stage1,
+  				stage2: results[0].stage2,
+  				stage3: results[0].stage3,
+  				stage4: results[0].stage4
+  			}
+  			if( stage.feeder !== null  && stage.stage1 === null){
+  			var currentstage = 'Feeder Stage';
+  			if( stage.stage1 !== null  && stage.stage2 === null){
+  			var currentstage = ' Stage One';
+  			if( stage.stage2 !==  null && stage.stage3 === null){
+  			var currentstage = ' Stage Two';
+  			if( stage.stage3 !== null  && stage.stage4 === null){
+  			var currentstage = ' Stage Three';
+  			if( stage.stage4 !== null){
+  			var currentstage = ' Stage Four';
   			pool.query('SELECT node.user,   (COUNT(parent.user) - (sub_tree.depth + 1)) AS depth FROM feeder AS node, feeder AS parent, feeder AS sub_parent, ( SELECT node.user, (COUNT(parent.user) - 1) AS depth FROM feeder AS node, feeder AS parent WHERE node.lft BETWEEN parent.lft AND parent.rgt AND node.user = ? GROUP BY node.user ORDER BY node.lft) AS sub_tree WHERE node.lft BETWEEN parent.lft AND parent.rgt AND node.lft BETWEEN sub_parent.lft AND sub_parent.rgt AND sub_parent.user  =  sub_tree.user GROUP BY node.user HAVING depth = ? ORDER BY depth ', [username, 1], function(err, results, fields){
 												if (err) throw err; 
 	
@@ -273,13 +370,27 @@ pinset( );
   						var gift = 0;
   						var total = cash + gift;
   					var error = 'You have not earned yet.'
-  						res.render( 'dashboard', {title: 'USER DASHBOARD', feedertree: feeder, stage1tree: stage1, stage2tree: stage2, stage3tree: stage3, stage4tree: stage4, gift: gift, total: total, cash: cash, car: earnings.car, error: error, salary: earnings.salary, empower: earnings.empower, leadership: earnings.leadership, laptop: earnings.laptop, phone: earnings.phone, powerbank: earnings.powerbank, stage4: earnings.stage4, stage3: earnings.stage3, stage2: earnings.stage2, stage1: earnings.stage1, feeder: earnings.feeder });		
+  						res.render( 'dashboard', {title: 'USER DASHBOARD', stage: currentstage, feedertree: feeder, stage1tree: stage1, stage2tree: stage2, stage3tree: stage3, stage4tree: stage4, gift: gift, total: total, cash: cash, car: earnings.car, error: error, salary: earnings.salary, empower: earnings.empower, leadership: earnings.leadership, laptop: earnings.laptop, phone: earnings.phone, powerbank: earnings.powerbank, stage4: earnings.stage4, stage3: earnings.stage3, stage2: earnings.stage2, stage1: earnings.stage1, feeder: earnings.feeder });		
   					}
   					else{
+  					var earnings = {
+  							feeder: results[0].feeder, 
+  							stage1: results[0].stage1,
+  							stage2: results[0].stage2,
+  							stage3: results[0].stage3,
+  							stage4: results[0].stage4,
+  							powerbank: results[0].powerbank,
+  							phone: results[0].phone,
+  							laptop: results[0].laptop,
+  							leadership: results[0].leadership,
+  							empower: results[0].empower,
+  							salary: results[0].salary,
+                        car: results[0].car
+  						}
   						var gift = earnings.salary + earnings.powerbank + earnings.phone + earnings.car + earnings.laptop + earnings.empower + earnings.leadership;
   						var cash  = earnings.feeder + earnings.stage1 + earnings.stage2 + earnings.stage3 + earnings.stage4;
   						var total = cash + gift;
-  						res.render( 'dashboard', {title: 'USER DASHBOARD', feeder: feeder, stage1: stage1, stage2: stage2, stage3: stage3, stage4: stage4, gift: gift, total: total, cash: cash, car: earnings.car, salary: earnings.salary, empower: earnings.empower, leadership: earnings.leadership, laptop: earnings.laptop, phone: earnings.phone, powerbank: earnings.powerbank, stage4: earnings.stage4, stage3: earnings.stage3, stage2: earnings.stage2, stage1: earnings.stage1, feeder: earnings.feeder });		
+  						res.render( 'dashboard', {title: 'USER DASHBOARD', feeder: feeder, stage1: stage1, stage2: stage2, stage3: stage3, stage4: stage4, gift: gift, total: total, cash: cash, car: earnings.car, salary: earnings.salary, empower: earnings.empower, leadership: earnings.leadership, laptop: earnings.laptop, phone: earnings.phone, powerbank: earnings.powerbank, stage4: earnings.stage4, stage3: earnings.stage3, stage2: earnings.stage2, stage: currentstage,  stage1: earnings.stage1, feeder: earnings.feeder });		
   					}
   				});
 	});
@@ -288,11 +399,54 @@ pinset( );
 	});
 	});
 	});
+	}
+	}
+	}
+	}
+	} 
+	});
   			}
   		});
  });
 });
 
+router.post('/sendmail',  function (req, res, next){
+	var mail = req.body.mail;
+	var sendma = ( '../nodemailer/mail.js' );
+	db.query( 'SELECT email FROM user', function ( err, results, fields ){
+		if(err) throw err
+		var users = results;
+		//loop to get the emails
+		var i = 0;
+		while(i < results.length){
+		var email = results[i].email;
+			sendma.sendmail( email, mail )
+		i++;
+		}
+		res.redirect( 'manage' );
+	});
+});
+//add new admin
+router.post('/addadmin', function (req, res, next) {
+	db.query('SELECT user_id, username FROM user WHERE username = ?', [username], function(err, results, fields){
+		if( err ) throw err;
+		if ( results.length === 0){
+			var error = 'Sorry this user does not exist.';
+			res.render('manage', {title: "MANAGE USERS", error: error });
+		}
+		else{
+			var newadmin = {
+				user_id: results[0].user_id,
+				username: results[0].username
+			}
+			db.query('INSERT INTO admin ( user ) values( ? )', [username], function(err, results, fields){
+				if( err ) throw err;
+				var success = 'New Admin Added Successfully!';
+				res.render('manage', {title: "MANAGE USERS", success: success });
+			});
+		}
+	});
+});
 //get profile
 router.get('/profile', authentificationMiddleware(), function(req, res, next) {
   var currentUser = req.session.passport.user.user_id;
@@ -406,6 +560,65 @@ function authentificationMiddleware(){
   } 
 }
 
+router.post('/reset', function(req, res, next) {
+	var password = req.body.password;
+	bcrypt.hash(password, saltRounds, null, function(err, hash){
+        db.query('UPDATE user SET password = ? WHERE username = ?', [username], function(error, results, fields){
+          if (error) throw error;
+          res.redirect( 'login' );
+        });
+    });
+});
+
+router.post('/searchtransaction', function(req, res, next) {
+	var search = req.body.username;
+	db.query('SELECT * FROM transactions WHERE user = ?', [username], function(err, results, fields){
+		if ( err ) throw err;
+		res.render('manage',  { title: 'Manage Users', transactions: results});
+	});
+});
+
+
+router.post('/debit', function(req, res, next) {
+	var username =  req.body.username;
+	var amount = req.body.amount;
+	var funds = req.body.funds;
+	db.query('SELECT username FROM users WHERE user = ?', [username], function(err, results, fields){
+		if ( err ) throw err;
+		if( results.length === 0 ){
+			var error = 'User does not extist.';
+			res.render('manage',  { title: 'Manage Users', error: error,  transactions: results});
+		}else{
+			//check his available balance
+			db.query('SELECT * FROM transactions WHERE user = ?', [username], function(err, results, fields){
+			if ( err ) throw err;
+				if( results.length === 0 ){
+					var error = 'insufficient funds';
+					res.render('manage',  { title: 'Manage Users', error: error,  transactions: results});
+				}
+				else{
+					//check if he has up to that amount
+					var last = results.slice( -1 )[0];
+					var bal = last.balance;
+					if ( bal < amount ){
+						var error = 'insufficient funds';
+							res.render('manage',  { title: 'Manage Users', error: error,  transactions: results});
+					}
+					else{
+						db.query( 'CALL debit( ? )' , [username], function ( err, results, fields ){
+							if( err ) throw err;
+							var success = 'success';
+							res.render('manage',  { title: 'Manage Users', success: success,  transactions: results});
+						});
+					}
+				}
+			});
+		}
+	res.render('manage',  { title: 'Manage Users', transactions: results});
+	});
+});
+
+
 //post log in
 router.post('/login', passport.authenticate('local', {
   failureRedirect: '/login',
@@ -484,7 +697,7 @@ router.post('/profile', function(req, res, next) {
 });
 
 //post the register
-var normal = require( '../functions/normal.js' );
+//var normal = require( '../functions/normal.js' );
 router.post('/register', function (req, res, next) {
 	console.log(req.body) 
   req.checkBody('sponsor', 'Sponsor must not be empty').notEmpty();
@@ -570,6 +783,8 @@ router.post('/register', function (req, res, next) {
                     										if (err) throw err;
                     										db.query( 'UPDATE pin SET user = ? WHERE  serial = ?', [username, serial], function ( err, results, fields ){
                     											if( err ) throw err;
+                    											//function for matrix
+                    											matrix.normal( username );
                     										});
                     									});
                     								});

@@ -53,7 +53,7 @@ exports.restmatrix = function restmatrix(x){
 							if (err) throw err;
 							db.query('CALL stage2try(?,?,?)', [s2user, s2user, x], function(err, results, fields){
 								 if (err) throw err;
-								 stage3func.stage3(x)
+								 stage3func.stage3(s2user)
 							 });
 						});
 					});
@@ -62,6 +62,18 @@ exports.restmatrix = function restmatrix(x){
 					//call function for stage 2 spill
 					stage2.stage2spill( x );
 				}
+				db.query('SELECT * FROM stage2_tree WHERE stage2 = ?', [x], function(err, results, fields){
+					if (err) throw err;
+					var user2  = {
+						a: results[0].a,
+						b: results[0].b,
+						c: results[0].c,
+						d: results[0].d
+					}
+					if(user2.a !== null && user2.b !== null && user2.c !== null && user2.d !== null){
+						stage3func.stage3(x);
+					}
+				});
 			});
 		});
 	});

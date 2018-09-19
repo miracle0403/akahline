@@ -1,11 +1,12 @@
 var s1userfunc = require( './s1user.js' );
 var feederfunc = require( './feederspill.js' );
-exports.normal = function (x, y ){
+exports.normal = function normal (x){
 	var db = require( '..db.js' );
-	db.query('SELECT parent.user FROM user_tree AS node, user_tree AS parent WHERE node.lft BETWEEN parent.lft AND parent.rgt AND node.user = ? AND parent.feeder is not null ORDER BY parent.lft', [x], function(err, results, fields){
+	db.query('SELECT parent.sponsor, parent.user FROM user_tree AS node, user_tree AS parent WHERE node.lft BETWEEN parent.lft AND parent.rgt AND node.user = ? AND parent.feeder is not null ORDER BY parent.lft', [x], function(err, results, fields){
 	if( err ) throw err;
 	var last = results.slice(-1)[0];
     var user = last.user;
+    var y = last.sponsor;
     console.log(user);
     	db.query ('SELECT * FROM feeder_tree WHERE user = ?', [user], function(err, results, fields){
 	 		if (err) throw err;

@@ -1,5 +1,6 @@
 var db  = require( '../db.js' );
-exports.stage4 = function (x ){
+var stage4func = require( '../functions/stage4spill.js' );
+exports.stage4 = function stage4(x ){
 	db.query('SELECT parent.sponsor, parent.user FROM user_tree AS node, user_tree AS parent WHERE node.lft BETWEEN parent.lft AND parent.rgt AND node.user = ? AND parent.stage4 is not null ORDER BY parent.lft', [x], function(err, results, fields){
 		if( err ) throw err;
 		var last4 = results.slice( -2 )[0];
@@ -54,6 +55,7 @@ exports.stage4 = function (x ){
 			}
 			if(stage4.a !== null && stage4.b !== null && stage4.c !== null && stage4.d === null){
 				//call function for stage 4 spillover here
+				stage4func.stage4spill( x );
 			}
 		});
 	});

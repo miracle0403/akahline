@@ -8,6 +8,9 @@
 <div class="alert alert-success">
     All Monies are calculated in Nigerian Naira.
   </div>
+  <div class="alert alert-primary">
+    Your current stage is {{stage}}
+  </div>
 <div class="content">
             <div class="container-fluid">
                 <div class="row">
@@ -174,21 +177,25 @@
                             <div class="content">
                                 <div class="row">
                                     <div class="col-xs-5">
-                                        <div class="icon-big icon-success text-center">
-                                            <i class="ti-wallet"></i>
+                                        <div class="icon-big icon-warning text-center">
+                                            <i class="ti-user"></i>
                                         </div>
                                     </div>
                                     <div class="col-xs-7">
                                         <div class="numbers">
-                                            <p>Revenue</p>
-                                            $1,345
+                                            <p>Stage2</p>
+                                            {{#if stage1tree}}
+        {{#each stage2tree}}
+           <p>{{user}}</p>
+        {{/each}}
+        {{/if}}
                                         </div>
                                     </div>
                                 </div>
                                 <div class="footer">
                                     <hr />
                                     <div class="stats">
-                                        <i class="ti-calendar"></i> Last day
+                                        <i class="ti-calendar"></i> Updated Now
                                     </div>
                                 </div>
                             </div>
@@ -200,13 +207,17 @@
                                 <div class="row">
                                     <div class="col-xs-5">
                                         <div class="icon-big icon-danger text-center">
-                                            <i class="ti-pulse"></i>
+                                            <i class="ti-user"></i>
                                         </div>
                                     </div>
                                     <div class="col-xs-7">
                                         <div class="numbers">
-                                            <p>Errors</p>
-                                            23
+                                            <p>Stage 3</p>
+                                            {{#if stage3tree}}
+        {{#each stage3tree}}
+           <p>{{user}}</p>
+        {{/each}}
+        {{/if}}
                                         </div>
                                     </div>
                                 </div>
@@ -224,14 +235,18 @@
                             <div class="content">
                                 <div class="row">
                                     <div class="col-xs-5">
-                                        <div class="icon-big icon-info text-center">
-                                            <i class="ti-twitter-alt"></i>
+                                        <div class="icon-big icon-dark text-center">
+                                            <i class="ti-user"></i>
                                         </div>
                                     </div>
                                     <div class="col-xs-7">
                                         <div class="numbers">
-                                            <p>Followers</p>
-                                            +45
+                                            <p>Stage 4</p>
+                                      {{#if stage4tree}}
+        {{#each stage4tree}}
+           <p>{{user}}</p>
+        {{/each}}
+        {{/if}}
                                         </div>
                                     </div>
                                 </div>

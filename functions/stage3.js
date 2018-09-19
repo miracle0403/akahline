@@ -61,6 +61,7 @@ exports.stage3 = function stage3( x ){
 						db.query('CALL stage3Amount(?)', [s3user], function(err, results, fields){
 							if (err) throw err;
 							//call function to enter stage 4
+							stage4func.stage4( s3user );
 						});
 					});
 				});
@@ -69,6 +70,18 @@ exports.stage3 = function stage3( x ){
 				//call function for stage 3 spillover
 				stage3func.stage3spill( x );
 			}
+			db.query('SELECT * FROM stage3_tree WHERE stage3 = ?', [x], function(err, results, fields){
+					if (err) throw err;
+					var user3  = {
+						a: results[0].a,
+						b: results[0].b,
+						c: results[0].c,
+						d: results[0].d
+					}
+					if(user3.a !== null && user3.b !== null && user3.c !== null && user3.d !== null){
+						stage3func.stage4(x);
+					}
+				});
 		});
 	});
 }
