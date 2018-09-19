@@ -4,7 +4,7 @@ var stage4func = require( './stage4.js' );
 exports.stage3 = function stage3( x ){
 	db.query('SELECT parent.sponsor, parent.user FROM user_tree AS node, user_tree AS parent WHERE node.lft BETWEEN parent.lft AND parent.rgt AND node.user = ? AND parent.stage3 is not null ORDER BY parent.lft', [x], function(err, results, fields){
 		if ( err ) throw err;
-		var last3 = results.slice( -2 )[0];
+		var last3 = results.slice( -1)[0];
 		var s3user = last3.user;
 		var s3spon = last.sponsor;
 		db.query('SELECT * FROM stage3_tree WHERE user = ?', [s3user], function(err, results, fields){

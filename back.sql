@@ -2,12 +2,105 @@ DELIMITER //
 CREATE PROCEDURE feederAmount (user VARCHAR(255))
 BEGIN
 INSERT INTO earnings (user, feeder, stage1, stage2, stage3, stage4, car, powerbank, phone, salary, laptop, empower, leadership) VALUES (user, 6000, 0, 0,0,0,0,0,0,0,0,0,0);
+
+INSERT INTO transactions (user, credit, description) VALUES (user, 6000, 'feeder cash' );
+
 UPDATE user_tree SET stage1 = "yes" WHERE user = user;
-INSERT INTO stage1(user, lft, rgt, amount) VALUES(user, @myLeft + 1, @myLeft + 2, 0);
-INSERT INTO stage1_tree ( user) VALUES ( user);
 
 END //
 DELIMITER ;
+
+DELIMITER //
+CREATE PROCEDURE stage1Amount (user VARCHAR(255))
+BEGIN
+UPDATE earnings SET powerbank = 4000, amount = amount + 50000 WHERE user = user;
+
+INSERT INTO transactions (user, credit, description) VALUES (user, 50000, 'stage1 cash' );
+
+INSERT INTO transactions (user, credit, description) VALUES (user, 4000, 'powerbank' );
+
+UPDATE user_tree SET stage2 = "yes" WHERE user = user;
+END //
+DELIMITER ;
+
+DELIMITER //
+CREATE PROCEDURE stage3Amount (user VARCHAR(255))
+BEGIN
+UPDATE earnings SET laptop = 100000, amount = amount + 300000 WHERE user = user;
+
+INSERT INTO transactions (user, credit, description) VALUES (user, 300000, 'stage3 cash' );
+
+INSERT INTO transactions (user, credit, description) VALUES (user, 100000, 'laptop' );
+
+UPDATE user_tree SET stage4 = "yes" WHERE user = user;
+
+END //
+DELIMITER ;
+
+DELIMITER //
+CREATE PROCEDURE stage4Amount (user VARCHAR(255))
+BEGIN
+UPDATE earnings SET car = 5000000, amount = amount + 800000, salary = 30000, empower = 100000, leadership = 100000 WHERE user = user;
+
+INSERT INTO transactions (user, credit, description) VALUES (user, 800000, 'stage4 cash' );
+
+INSERT INTO transactions (user, credit, description) VALUES (user, 5000000, 'car' );
+
+INSERT INTO transactions (user, credit, description) VALUES (user, 100000, 'leadership' );
+
+INSERT INTO transactions (user, credit, description) VALUES (user, 100000, 'empower' );
+
+INSERT INTO transactions (user, credit, description) VALUES (user, 30000, 'salary' );
+
+
+
+UPDATE user_tree SET stage4 = "yes" WHERE user = user;
+
+END //
+DELIMITER ;
+
+DELIMITER //
+CREATE PROCEDURE stage2Amount (user VARCHAR(255))
+BEGIN
+UPDATE earnings SET phone = 30000, amount = amount + 100000 WHERE user = user;
+
+INSERT INTO transactions (user, credit, description) VALUES (user, 100000, 'stage2 cash' );
+
+INSERT INTO transactions (user, credit, description) VALUES (user, 30000, 'phone' );
+
+UPDATE user_tree SET stage3 = "yes" WHERE user = user;
+
+END //
+DELIMITER ;
+
+DELIMITER //
+CREATE PROCEDURE stage3try(sponsor VARCHAR(255), mother VARCHAR(255), child VARCHAR(255))
+BEGIN
+SELECT @myLeft := lft FROM stage3 WHERE user = mother;
+INSERT INTO stage3_tree (sponsor, user) VALUES (sponsor, child);
+UPDATE sttage3 SET rgt = rgt + 2 WHERE rgt > @myLeft;
+UPDATE stage3 SET lft = lft + 2 WHERE lft > @myLeft;
+UPDATE stage3 SET amount = amount + 1 WHERE user = mother;
+
+INSERT INTO stage3(user, lft, rgt, amount) VALUES(child, @myLeft + 1, @myLeft + 2, 0);
+
+END //
+DELIMITER ;
+
+DELIMITER //
+CREATE PROCEDURE stage4try(sponsor VARCHAR(255), mother VARCHAR(255), child VARCHAR(255))
+BEGIN
+SELECT @myLeft := lft FROM stage4 WHERE user = mother;
+INSERT INTO stage4_tree (sponsor, user) VALUES (sponsor, child);
+UPDATE sttage4 SET rgt = rgt + 2 WHERE rgt > @myLeft;
+UPDATE stage4 SET lft = lft + 2 WHERE lft > @myLeft;
+UPDATE stage4 SET amount = amount + 1 WHERE user = mother;
+
+INSERT INTO stage4(user, lft, rgt, amount) VALUES(child, @myLeft + 1, @myLeft + 2, 0);
+
+END //
+DELIMITER ;
+
 
 CREATE TABLE pin( user VARCHAR(255) UNIQUE, serial text NOT NULL, pin varchar( 255 ) NOT NULL, date DATETIME  DEFAULT CURRENT_TIMESTAMP);
 
@@ -60,12 +153,31 @@ CREATE TABLE `feeder` (
 	`rgt` INT(11) NOT NULL
 );
 
+CREATE TABLE `admin` (
+	`user` VARCHAR(255)NOT NULL,
+);
+
 CREATE TABLE `stage2` (
 	`user` VARCHAR(255)NOT NULL,
 	`amount` INT(11) NOT NULL,
 	`lft` INT(11) NOT NULL,
 	`rgt` INT(11) NOT NULL
 );
+
+
+DELIMITER //
+CREATE PROCEDURE stage2try(sponsor VARCHAR(255), mother VARCHAR(255), child VARCHAR(255))
+BEGIN
+SELECT @myLeft := lft FROM stage2 WHERE user = mother;
+INSERT INTO stage2_tree (sponsor, user) VALUES (sponsor, child);
+UPDATE sttage2 SET rgt = rgt + 2 WHERE rgt > @myLeft;
+UPDATE stage2 SET lft = lft + 2 WHERE lft > @myLeft;
+UPDATE stage2 SET amount = amount + 1 WHERE user = mother;
+
+INSERT INTO stage2(user, lft, rgt, amount) VALUES(child, @myLeft + 1, @myLeft + 2, 0);
+
+END //
+DELIMITER ;
 
 CREATE TABLE `stage3` (
 	`user` VARCHAR(255)NOT NULL,
@@ -123,8 +235,19 @@ CREATE TABLE `earnings` (
 	`car` INT(11) NOT NULL
 );
 
+CREATE TABLE `transactions` (
+	`id` INT(11) UNIQUE PRIMARY KEY AUTO_INCREMENT NOT NULL
+	`user` VARCHAR(255) NOT NULL,
+	`balance_b/f` INT(11) NOT NULL,
+	`credit` INT(11) ,
+	`debit` INT(11),
+	`description` VARCHAR(255) NOT NULL,
+	`debit_receipt` VARCHAR(255),
+	`date` DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL
+);
+
 drop table user;
-CREATE TABLE user( user_id INT( 11 ) UNIQUE PRIMARY KEY AUTO_INCREMENT NOT NULL, sponsor text,  username varchar( 255 ) UNIQUE NOT NULL, full_name varchar ( 255 ) NOT NULL, verification text, status text, email varchar ( 255 ) UNIQUE NOT NULL, phone VARCHAR(255) NOT NULL, code INT( 11 ) NOT NULL, password varchar( 255 ) NOT NULL, paid varchar( 255 ),date DATETIME  )	;
+CREATE TABLE user( user_id INT( 11 ) UNIQUE PRIMARY KEY AUTO_INCREMENT NOT NULL, sponsor text,  username varchar( 255 ) UNIQUE NOT NULL, full_name varchar ( 255 ) NOT NULL, verification text, status text, email varchar ( 255 ) UNIQUE NOT NULL, phone VARCHAR(255) NOT NULL, code INT( 11 ) NOT NULL, password varchar( 255 ) NOT NULL, paid varchar( 255 ),date DATETIME  DEFAULT CURRENT_TIMESTAMP)	;
 
 CREATE TABLE `profile` (
 	`user` VARCHAR (255) NOT NULL,
@@ -149,8 +272,6 @@ UPDATE user_tree SET lft = lft + 2 WHERE lft > @myLeft;
 INSERT INTO user_tree(user, rgt, lft) VALUES(username, @myLeft + 2, @myLeft + 1);
 
 INSERT INTO user (sponsor, full_name, phone, code, username, email, password, status, verification) VALUES ( sponsor, full_name, phone,code, username, email, password, 'active', 'no');
-UPDATE pin SET user = child WHERE serial = serial;
-
 END//
 DELIMITER ;
 
@@ -174,7 +295,8 @@ SELECT @myLeft := lft FROM stage1 WHERE user = mother;
 UPDATE stage1 SET rgt = rgt + 2 WHERE rgt > @myLeft;
 UPDATE stage1 SET lft = lft + 2 WHERE lft > @myLeft;
 UPDATE stage1 SET amount = amount + 1 WHERE user = mother;
-
+INSERT INTO stage1(user, lft, rgt, amount) VALUES(user, @myLeft + 1, @myLeft + 2, 0);
+INSERT INTO stage1_tree ( user) VALUES ( child);
 
 END //
 DELIMITER ;

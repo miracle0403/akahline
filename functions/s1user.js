@@ -3,7 +3,7 @@ var stage2func = require( './stage2.js' );
 exports.s1user = function s1user(x){
 	db.query('SELECT, parent.sponsor, parent.user FROM user_tree AS node, user_tree AS parent WHERE node.lft BETWEEN parent.lft AND parent.rgt AND node.user = ? AND parent.stage1 is not null ORDER BY parent.lft', [x], function(err, results, fields){
                     			if( err ) throw err;
-                    			var last1 = results.slice(-2)[0];
+                    			var last1 = results.slice(-1)[0];
                     			var s1user = last1.user;
                     			var s1spon = last1.sponsor;
                     			console.log(s1user);
