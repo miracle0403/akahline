@@ -535,7 +535,7 @@ var mail = require( '../nodemailer/pin.js' );
       console.log(str);
 	  var pinn = 'AGS' + pin;
 	  exports.pinn = pinn;
-     /* bcrypt.hash(pinn, saltRounds, null, function(err, hash){
+     bcrypt.hash(pinn, saltRounds, null, function(err, hash){
         pool.query('INSERT INTO pin (pin, serial) VALUES (?, ?)', [hash, str], function(error, results, fields){
           if (error) throw error;
           exports.str = str;
@@ -545,7 +545,7 @@ var mail = require( '../nodemailer/pin.js' );
          var mail = 'mify1@yahoo.com';
          // mail.sendpin( mail );
         });
-      });*/
+      });
     });
   });
 }
