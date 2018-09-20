@@ -3,9 +3,7 @@ CREATE PROCEDURE feederAmount (user VARCHAR(255))
 BEGIN
 INSERT INTO earnings (user, feeder, stage1, stage2, stage3, stage4, car, powerbank, phone, salary, laptop, empower, leadership) VALUES (user, 6000, 0, 0,0,0,0,0,0,0,0,0,0);
 
-INSERT INTO transactions (user, credit, description) VALUES (user, 6000, 'feeder cash' );
-
-UPDATE user_tree SET stage1 = "yes" WHERE user = user;
+INSERT INTO transactions (user, credit, balance_bf, description, balance) VALUES (user, 6000, 0, 'feeder cash', 6000);
 
 END //
 DELIMITER ;
@@ -134,6 +132,7 @@ ENGINE=InnoDB
 ;
 CREATE TABLE `stage1_tree` (
 	`matrix_id` INT(11) PRIMARY KEY AUTO_INCREMENT NOT NULL,
+	`sponsor` VARCHAR(255) NOT NULL,
 	`user` VARCHAR(255) NOT NULL,
 	`a` VARCHAR(255) NULL DEFAULT NULL,
 	`b` VARCHAR(255) NULL DEFAULT NULL,
@@ -168,7 +167,7 @@ CREATE TABLE `feeder` (
 );
 
 CREATE TABLE `admin` (
-	`user` VARCHAR(255)NOT NULL,
+	`user` VARCHAR(255)NOT NULL
 );
 
 CREATE TABLE `stage2` (
@@ -248,15 +247,16 @@ CREATE TABLE `earnings` (
 	`salary` INT(11) NOT NULL,
 	`car` INT(11) NOT NULL
 );
-
+drop table transactions;
 CREATE TABLE `transactions` (
-	`id` INT(11) UNIQUE PRIMARY KEY AUTO_INCREMENT NOT NULL
+	`id` INT(11)  PRIMARY KEY AUTO_INCREMENT NOT NULL,
 	`user` VARCHAR(255) NOT NULL,
-	`balance_b/f` INT(11) NOT NULL,
+	`balance_bf` INT(11) NOT NULL,
 	`credit` INT(11) ,
 	`debit` INT(11),
 	`description` VARCHAR(255) NOT NULL,
 	`debit_receipt` VARCHAR(255),
+	`balance` INT(11) NOT NULL,
 	`date` DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL
 );
 
@@ -342,16 +342,16 @@ CREATE TABLE `stage4_tree` (
 COLLATE='latin1_swedish_ci'
 ENGINE=InnoDB
 ;
-
+drop procedure stage1in;
 DELIMITER //
-CREATE PROCEDURE stage1in( mother VARCHAR(255), child VARCHAR(255))
+CREATE PROCEDURE stage1in( sponsor VARCHAR(255), mother VARCHAR(255), child VARCHAR(255))
 BEGIN
 SELECT @myLeft := lft FROM stage1 WHERE user = mother;
 UPDATE stage1 SET rgt = rgt + 2 WHERE rgt > @myLeft;
 UPDATE stage1 SET lft = lft + 2 WHERE lft > @myLeft;
 UPDATE stage1 SET amount = amount + 1 WHERE user = mother;
-INSERT INTO stage1(user, lft, rgt, amount) VALUES(user, @myLeft + 1, @myLeft + 2, 0);
-INSERT INTO stage1_tree ( user) VALUES ( child);
+INSERT INTO stage1(user, lft, rgt, amount) VALUES(child, @myLeft + 1, @myLeft + 2, 0);
+INSERT INTO stage1_tree ( sponsor, user) VALUES (sponsor, child);
 
 END //
 DELIMITER ;

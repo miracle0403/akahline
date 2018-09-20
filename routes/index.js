@@ -15,7 +15,7 @@ var mysql = require( 'mysql' );
 var db = require('../db.js');
 var expressValidator = require('express-validator'); 
 var  matrix = require('../functions/normal.js');
-
+ 
 
 var bcrypt = require('bcrypt-nodejs');
 function rounds( err, results ){ 
@@ -131,8 +131,9 @@ router.get('/manage', authentificationMiddleware(), function (req, res, next){
 			else{
 			//earnings sum
 			db.query( 'SELECT SUM(feeder), SUM(stage1),SUM(stage2), SUM(stage3), SUM(stage4), SUM(powerbank), SUM(phone), SUM(laptop), SUM(car), SUM(empower), SUM(leadership), SUM(salary) FROM earnings', function ( err, results, fields ){
+			console.log( results )
 			var earnings = {
-				feeder: results[0].feeder,
+				feeder: results[0].SUM( feeder ),
 				stage1: results[0].stage1,
 				stage2: results[0].stage2,
 				stage3: results[0].stage3,
@@ -145,9 +146,10 @@ router.get('/manage', authentificationMiddleware(), function (req, res, next){
 				salary: results[0].salary,
 				empower: results[0].empower
 			}
-			var totalgift = earnings.phone + eanings.powerbank + earnings.car + earnings.empower + earnjngs.salary + earnings.leadership;
+			console.log( earnings.feeder )
+			var totalgift = earnings.phone + earnings.powerbank + earnings.car + earnings.empower + earnings.salary + earnings.leadership;
 			var totalcash  = earnings.feeder + earnings.stage1 + earnings.stage2 + earnings.stage3 + earnings.stage4;
-			var stage4gifts = earnings.car + earnings.empower + earnjngs.salary + earnings.leadership;
+			var stage4gifts = earnings.car + earnings.empower + earnings.salary + earnings.leadership;
 			//stage2
 			db.query( 'SELECT COUNT(user) FROM stage2_tree', function ( err, results, fields ){
 				  if(err) throw err;
@@ -355,7 +357,7 @@ router.get('/dashboard', authentificationMiddleware(), function(req, res, next) 
 											var total = cash + gift;
 											var error = 'You have not earned yet.'
 											var currentstage = 'Feeder Stage';
-											res.render( 'dashboard', {title: 'USER DASHBOARD', feeder: feeder, stage1: stage1, stage2: stage2, stage3: stage3, stage4: stage4, gift: gift, total: total, cash: cash, car: earnings.car, salary: earnings.salary, empower: earnings.empower, leadership: earnings.leadership, laptop: earnings.laptop, phone: earnings.phone, powerbank: earnings.powerbank, stage4: earnings.stage4, stage3: earnings.stage3, stage2: earnings.stage2, stage: currentstage,  stage1: earnings.stage1, feeder: earnings.feeder });		
+											res.render( 'dashboard', {title: 'USER DASHBOARD', feedertree: feeder, error: error,  stage1tree: stage1, stage2: stage2, stage3: stage3, stage4: stage4, gift: gift, total: total, cash: cash, car: earnings.car, salary: earnings.salary, empower: earnings.empower, leadership: earnings.leadership, laptop: earnings.laptop, phone: earnings.phone, powerbank: earnings.powerbank, stage4: earnings.stage4, stage3: earnings.stage3, stage2: earnings.stage2, stage: currentstage,  stage1: earnings.stage1, feeder: earnings.feeder });		
 										}else{
 											
 											var earnings = {
@@ -380,34 +382,30 @@ router.get('/dashboard', authentificationMiddleware(), function(req, res, next) 
 											if( stage.feeder !== null  && stage.stage1 === null){
 												var currentstage = 'Feeder Stage';
 												console.log(currentstage);
-												res.render( 'dashboard', {title: 'USER DASHBOARD', feeder: feeder, stage1: stage1, stage2: stage2, stage3: stage3, stage4: stage4, gift: gift, total: total, cash: cash, car: earnings.car, salary: earnings.salary, empower: earnings.empower, leadership: earnings.leadership, laptop: earnings.laptop, phone: earnings.phone, powerbank: earnings.powerbank, stage4: earnings.stage4, stage3: earnings.stage3, stage2: earnings.stage2, stage: currentstage,  stage1: earnings.stage1, feeder: earnings.feeder });		
-										
+												res.render( 'dashboard', {title: 'USER DASHBOARD', feedertree: feeder, stage1tree: stage1, stage2tree: stage2, stage3tree: stage3, stage4tree: stage4, gift: gift, total: total, cash: cash, car: earnings.car, salary: earnings.salary, empower: earnings.empower, leadership: earnings.leadership, laptop: earnings.laptop, phone: earnings.phone, powerbank: earnings.powerbank, stage4: earnings.stage4, stage3: earnings.stage3, stage2: earnings.stage2, stage: currentstage,  stage1: earnings.stage1, feeder: earnings.feeder });		
+	}									
 												if( stage.stage1 !== null  && stage.stage2 === null){
 													var currentstage = ' Stage One';
 													console.log(currentstage);
-													res.render( 'dashboard', {title: 'USER DASHBOARD', feeder: feeder, stage1: stage1, stage2: stage2, stage3: stage3, stage4: stage4, gift: gift, total: total, cash: cash, car: earnings.car, salary: earnings.salary, empower: earnings.empower, leadership: earnings.leadership, laptop: earnings.laptop, phone: earnings.phone, powerbank: earnings.powerbank, stage4: earnings.stage4, stage3: earnings.stage3, stage2: earnings.stage2, stage: currentstage,  stage1: earnings.stage1, feeder: earnings.feeder });		
+													res.render( 'dashboard', {title: 'USER DASHBOARD', feedertree: feeder, stage1tree: stage1, stage2tree: stage2, stage3tree: stage3, stage4tree: stage4, gift: gift, total: total, cash: cash, car: earnings.car, salary: earnings.salary, empower: earnings.empower, leadership: earnings.leadership, laptop: earnings.laptop, phone: earnings.phone, powerbank: earnings.powerbank, stage4: earnings.stage4, stage3: earnings.stage3, stage2: earnings.stage2, stage: currentstage,  stage1: earnings.stage1, feeder: earnings.feeder });		
 										
-													if( stage.stage2 !==  null && stage.stage3 === null){
+	}												if( stage.stage2 !==  null && stage.stage3 === null){
 														var currentstage = ' Stage Two';
 														console.log(currentstage);
 														res.render( 'dashboard', {title: 'USER DASHBOARD', feeder: feeder, stage1: stage1, stage2: stage2, stage3: stage3, stage4: stage4, gift: gift, total: total, cash: cash, car: earnings.car, salary: earnings.salary, empower: earnings.empower, leadership: earnings.leadership, laptop: earnings.laptop, phone: earnings.phone, powerbank: earnings.powerbank, stage4: earnings.stage4, stage3: earnings.stage3, stage2: earnings.stage2, stage: currentstage,  stage1: earnings.stage1, feeder: earnings.feeder });		
-										
+}										
 														if( stage.stage3 !== null  && stage.stage4 === null){
 															var currentstage = ' Stage Three';
 															res.render( 'dashboard', {title: 'USER DASHBOARD', feeder: feeder, stage1: stage1, stage2: stage2, stage3: stage3, stage4: stage4, gift: gift, total: total, cash: cash, car: earnings.car, salary: earnings.salary, empower: earnings.empower, leadership: earnings.leadership, laptop: earnings.laptop, phone: earnings.phone, powerbank: earnings.powerbank, stage4: earnings.stage4, stage3: earnings.stage3, stage2: earnings.stage2, stage: currentstage,  stage1: earnings.stage1, feeder: earnings.feeder });		
-										
+		}								
 															//console.log(currentstage);
 															if( stage.stage4 !== null){
 																var currentstage = ' Stage Four';
 																console.log(currentstage);
 																res.render( 'dashboard', {title: 'USER DASHBOARD', feeder: feeder, stage1: stage1, stage2: stage2, stage3: stage3, stage4: stage4, gift: gift, total: total, cash: cash, car: earnings.car, salary: earnings.salary, empower: earnings.empower, leadership: earnings.leadership, laptop: earnings.laptop, phone: earnings.phone, powerbank: earnings.powerbank, stage4: earnings.stage4, stage3: earnings.stage3, stage2: earnings.stage2, stage: currentstage,  stage1: earnings.stage1, feeder: earnings.feeder });		
-										
+	}									
 																
-															}
-														}
-													}
-												}
-											}
+															
 										}
 									});
 								});

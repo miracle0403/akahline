@@ -72,8 +72,11 @@ exports.feederspill = function ( x, u, y, res){
 										  		if (err) throw err;
 										  		db.query('CALL feederAmount(?)', [feeder4spill.user], function(err, results, fields){
 													if (err) throw err;
+													db.query('Update user_tree set stage1 = ? WHERE user = ?', ['yes', feeder4spill.user], function(err, results, fields){
+							if (err) throw err;
 													//function to enter stage1
 													s1userfunc.s1user(feeder4spill.user, res);
+													});
 												});
 										  	});
 										});
