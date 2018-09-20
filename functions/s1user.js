@@ -8,7 +8,7 @@ exports.s1user = function s1user(x, res){
                     			var s1user = last1.user;
                     			var s1spon = last1.sponsor;
                     			console.log(last1);
-                    			db.query('SELECT * FROM stage1 WHERE user = ?', [s1user], function(err, results, fields){
+                    			db.query('SELECT * FROM stage1_tree WHERE user = ?', [s1user], function(err, results, fields){
                     				if( err ) throw err;
                     				var stage1 = {
 											a: results[0].a,
