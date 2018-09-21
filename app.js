@@ -72,6 +72,7 @@ var options = {
   connectionLimit : 100,
   host: "localhost",
   user: "root",
+  password: 'Akahlineglobal',
   database: "new"
 };
 
