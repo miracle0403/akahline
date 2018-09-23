@@ -31,7 +31,7 @@ INSERT INTO transactions (user, credit, description) VALUES (user, 50000, 'stage
 
 INSERT INTO transactions (user, credit, description) VALUES (user, 4000, 'powerbank' );
 
-UPDATE user_tree SET stage2 = "yes" WHERE user = user;
+
 END //
 DELIMITER ;
 
@@ -331,7 +331,7 @@ ENGINE=InnoDB
 
 drop table stage4;
 CREATE TABLE `stage4_tree` (
-	`matrix_id` VARCHAR(255) PRIMARY KEY AUTO_INCREMENT NOT NULL,
+	`matrix_id` INT(11) PRIMARY KEY AUTO_INCREMENT NOT NULL,
 	`sponsor` VARCHAR(255) NOT NULL,
 	`user` VARCHAR(255) NOT NULL,
 	`a` VARCHAR(255) NULL DEFAULT NULL,

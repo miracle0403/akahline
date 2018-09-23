@@ -7,7 +7,7 @@ var pool  = mysql.createPool({
   waitForConnections: true,
   host: "localhost",
   user: "root",
-  password: 'Akahlineglobal',
+//  password: 'Akahlineglobal',
   database: "new"
 });
 
@@ -20,7 +20,7 @@ pool.getConnection( function ( err, con ){
 			if ( err ) throw err;
 			else{
 			console.log( 'solution is ' + results[0]);
-			console.log( 'i am collins love' );
+			//console.log( 'i am collins love' );
 			pool.releaseConnection( con );
 			}
 		});
