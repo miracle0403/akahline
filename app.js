@@ -72,7 +72,7 @@ var options = {
   connectionLimit : 100,
   host: "localhost",
   user: "root",
-  //password: 'Akahlineglobal',
+  password: 'Akahlineglobal',
   database: "new"
 };
 
