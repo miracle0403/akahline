@@ -1,7 +1,8 @@
-'use strict'; 
+'use strict';  
 var env  = require('dotenv').config();
 const nodemailer = require('nodemailer');
-var events = require( 'events' )
+var events = require( 'events' );
+//var bootstrap = require( 'bootstrap' );
 //const Sequelize = require('sequelize');
 var createError = require('http-errors');
 var express = require('express');
@@ -26,7 +27,7 @@ var MySQLStore = require ('express-mysql-session')(session);
 var flash = require('express-flash-messages');
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
-var db = require('./db.js');
+var db = require('./db.js'); 
 
 var app = express();
 //emitter.setMaxListeners(0);
@@ -38,8 +39,8 @@ app.set('view engine', 'hbs');
 var messageTemplate = fs.readFileSync(__dirname + '/views/messages.hbs', 'utf8');
 hbs.registerPartial('message', messageTemplate); 
 
-var earningsTemplate = fs.readFileSync(__dirname + '/views/earnings.hbs', 'utf8');
-hbs.registerPartial('earnings', earningsTemplate); 
+var mainnavTemplate = fs.readFileSync(__dirname + '/views/mainnav.hbs', 'utf8');
+hbs.registerPartial('mainnav', mainnavTemplate); 
 
 var noearnTemplate = fs.readFileSync(__dirname + '/views/noearn.hbs', 'utf8');
 hbs.registerPartial('noearn', noearnTemplate); 
@@ -58,6 +59,8 @@ hbs.registerPartial('spagef', dashboardfTemplate);
 
 var navTemplate = fs.readFileSync(__dirname + '/views/nav.hbs', 'utf8');
 hbs.registerPartial('nav', navTemplate); 
+
+
 
 
 
@@ -104,7 +107,7 @@ app.use(function(req, res, next){
   next(); 
 })
 app.use('/', indexRouter);
-app.use('/users', usersRouter);
+app.use('/users', usersRouter); 
 
 passport.use(new localStrategy(function(username, password, done){
     console.log(username);
@@ -138,7 +141,7 @@ passport.use(new localStrategy(function(username, password, done){
     });
 
     
-}))
+}));
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
   next(createError(404));

@@ -37,7 +37,7 @@ exports.s1user = function s1user(x, res){
 										  		if (err) throw err;
 												db.query('UPDATE stage1_tree SET a = ? WHERE user = ?', [x, s1user], function (err, results, fields){
 											 		if (err) throw err;
-											 		fillup.fillup( s1user );
+											 		fillup.fillup( x );
 											  															res.render('register', {title: 'Successful Entrance'});
 											 	});
 										  	});
@@ -47,7 +47,7 @@ exports.s1user = function s1user(x, res){
 												if( err ) throw err;
 												db.query('UPDATE stage1_tree SET b = ? WHERE user = ?', [x, s1user], function (err, results, fields){
 											  		if (err) throw err;
-											  fillup.fillup( s1user );
+											  fillup.fillup( x );
 											  res.render('register', {title: 'Successful Entrance'});
 											  });
 											});
@@ -57,7 +57,7 @@ exports.s1user = function s1user(x, res){
 										  if (err) throw err;
 										  db.query('UPDATE stage1_tree SET c = ? WHERE user = ?', [x, s1user], function (err, results, fields){
 											  if (err) throw err;
-											  fillup.fillup( s1user );
+											  fillup.fillup( x );
 											  res.render('register', {title: 'Successful Entrance'});
 												  });
 											  });
@@ -67,7 +67,7 @@ exports.s1user = function s1user(x, res){
 										 	 	if( err ) throw err;
 										 	 	db.query('UPDATE stage1_tree SET c = ? WHERE user = ?', [x, s1user], function (err, results, fields){
 												  if (err) throw err;
-												  fillup.fillup( s1user );
+												  fillup.fillup( x );
 											  res.render('register', {title: 'Successful Entrance'});
 											 	});
 									 	 	});

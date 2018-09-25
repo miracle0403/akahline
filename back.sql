@@ -8,6 +8,14 @@ INSERT INTO transactions (user, credit, balance_bf, description, balance) VALUES
 END //
 DELIMITER ;
 
+DELIMITER //
+CREATE PROCEDURE debit (user VARCHAR(255), balance INT (11))
+BEGIN
+INSERT INTO transactions (user, debit, balance_bf, description, balance) VALUES (user, balance, balance, 'All funds', 0);
+INSERT INTO withdraw (user, status, description, amount) VALUES (user, 'pending', 'All funds', balance);
+END //
+DELIMITER ;
+
 drop table feeder_tree
 CREATE TABLE `feeder_tree` (
 	`matrix_id` INT(11) PRIMARY KEY AUTO_INCREMENT NOT NULL,
@@ -167,7 +175,7 @@ CREATE TABLE `feeder` (
 );
 
 CREATE TABLE `admin` (
-	`user` VARCHAR(255)NOT NULL
+	`user` INT(11)NOT NULL
 );
 
 CREATE TABLE `stage2` (
@@ -257,6 +265,16 @@ CREATE TABLE `transactions` (
 	`description` VARCHAR(255) NOT NULL,
 	`debit_receipt` VARCHAR(255),
 	`balance` INT(11) NOT NULL,
+	`date` DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL
+);
+
+drop table withdraw;
+CREATE TABLE `withdraw` (
+	`Order_id` INT(11)  PRIMARY KEY AUTO_INCREMENT NOT NULL,
+	`user` VARCHAR(255) NOT NULL,
+	`status` VARCHAR(255),
+	`amount` INT(11),
+	`description` VARCHAR(255) NOT NULL,
 	`date` DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL
 );
 

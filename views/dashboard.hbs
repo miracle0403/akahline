@@ -6,7 +6,7 @@
   </div>
 {{/if}}
 <div class="alert alert-success">
-    All Monies are calculated in Nigerian Naira.
+    All Earnings are calculated in Nigerian Naira.
   </div>
   <div class="alert alert-success">
     Your current stage is {{stage}}
@@ -47,22 +47,25 @@
                                 <div class="row">
                                     <div class="col-xs-5">
                                         <div class="icon-big icon-success text-center">
-                                            <i class="ti-wallet"></i>
+                                            <i class="ti-gift"></i>
                                         </div>
                                     </div>
                                     <div class="col-xs-7">
                                         <div class="numbers">
-                                            <p><b>MY WALLET</b></p>
+                                            <p><b>MY EARNINGS BREAKDOWN</b></p>
                                             <p>Feeder: {{feeder}} </p>
                                             <p>Stage One: {{stage1}}</p>
                                              <p>Stage Two: {{stage2}}</p>
                                               <p>Stage Three: {{stage3}}</p>
                                                <p>Stage Four: {{stage4}} </p><br>
-                                               <form method ="POST" action ="/withdraw">
-              <div class="form-group">
-              <button type="submit" class="btn btn-primary">WITHDRAW</button>
-              </div>
-	  </form>
+                                                  <p>POWER BANK: {{powerbank}}</p>
+                                              <p>PHONE : {{phone}}</p>
+                                              <p>LAPTOP: {{laptop}}</p>
+                                              <p>CAR: {{car}}</p>
+                                              <p>EMPOWERMENT BONUS: {{empower}}</p>
+                                              <p>LEADERSHIP BONUS: {{leadership}}</p>
+                                              <p>SALARY: {{salary}}</p>
+                                               
                                         </div>
                                     </div>
                                 </div>
@@ -81,19 +84,20 @@
                                 <div class="row">
                                     <div class="col-xs-5">
                                         <div class="icon-big icon-danger text-center">
-                                            <i class="ti-gift"></i>
+                                            <i class="ti-wallet"></i>
                                         </div>
                                     </div>
                                     <div class="col-xs-7">
                                         <div class="numbers">
-                                            <p><b>MY GIFTS </b> </p>
-                                              <p>POWER BANK: {{powerbank}}</p>
-                                              <p>PHONE : {{phone}}</p>
-                                              <p>LAPTOP: {{laptop}}</p>
-                                              <p>CAR: {{car}}</p>
-                                              <p>EMPOWERMENT BONUS: {{empower}}</p>
-                                              <p>LEADERSHIP BONUS: {{leadership}}</p>
-                                              <p>SALARY: {{salary}}</p>
+                                            <p><b>MY WALLET </b> </p>
+                                                   <p>ACCOUNT BALANCE: {{balance}} </p>
+                                           
+                                               <form method ="POST" action ="/withdraw">
+              <div class="form-group">
+              <button type="submit" class="btn btn-primary">WITHDRAW</button>
+              </div>
+	  </form>
+                                           
                                             
                                         </div>
                                     </div>

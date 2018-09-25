@@ -1,4 +1,4 @@
-exports.sendmail= function sendmail(x, y){
+exports.sendmail= function sendmail(x, y, z){
 	var nodemailer = require('nodemailer');
 	//var mail = require( '../functions/mailfunctions.js' );
 	
@@ -19,7 +19,7 @@ transporter.use('compile', hbs({ viewPath: './views/mail', extName: '.hbs' }));
 	var mailOptions = {
   		from: 'noreply@swiftcircle.website',
   		to: x,
-  		subject: 'Password Reset',
+  		subject: z,
 		template: 'adminmail',
   		context: {
   			body: y

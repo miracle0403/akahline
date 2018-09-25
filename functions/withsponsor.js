@@ -2,7 +2,7 @@ var db = require( '../db.js' );
 exports.fillup = function fillup( x ){
 	db.query( 'SELECT  parent.user FROM stage1 AS node, user_tree AS parent WHERE node.lft BETWEEN parent.lft AND parent.rgt AND node.user = ? ORDER BY parent.lft',[x], function ( err, results, fields ){
 		if( err ) throw err;
-		var oya = results.slice( -2 )[0];
+		var oya = results.slice( -3 )[0];
 		var oyana = oya.user;
 		console.log( 'oyana is ' + oyana)
 		//the parent of s1.user is gotten up... get their downlines.
