@@ -29,7 +29,7 @@ var pool  = mysql.createPool({
   waitForConnections: true,
   host: "localhost",
   user: "root",
-  //password: 'Akahlineglobal',
+  password: 'Akahlineglobal',
   database: "new"
 });
 
@@ -570,7 +570,7 @@ passport.deserializeUser(function(user_id, done){
 pinset( )
 //get function for pin and serial number
 function pinset(){
-var mail = require( '../nodemailer/pin.js' );
+var maiyl = require( '../nodemailer/pin.js' );
   var charSet = new securePin.CharSet(); 
   charSet.addLowerCaseAlpha().addUpperCaseAlpha().addNumeric().randomize();
   securePin.generatePin(10, function(pin){
@@ -585,15 +585,15 @@ var mail = require( '../nodemailer/pin.js' );
           exports.str = str;
           //console.log(results)
           //the function to send mail
-         // var mail = 'Sageabraham4@gmail.com';
-         var mail = 'mify1@yahoo.com';
-         // mail.sendpin( mail );
+          var mail =   'Sageabraham4@gmail.com';
+         //var mail = 'mify1@yahoo.com';
+         maiyl.sendpin( mail,pinn, str ); 
         });
       });
     });
   });
 }
-//pinset(  )
+pinset(  )
 //authentication middleware snippet 
 function authentificationMiddleware(){
   return (req, res, next) => {

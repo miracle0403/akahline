@@ -1,9 +1,8 @@
-exports.sendpin= function sendpin(x){
+exports.sendpin= function sendpin(x, pinn, str){
 	var nodemailer = require('nodemailer');
-	var pind = require( '../routes/index.js' );	
-	var pin = pind.pinn;
-	var serial = pind.str;
-	console.log( pin );
+//	var pind = require( '../routes/index.js' );	
+	
+	//console.log( pin );
 	var hbs = require('nodemailer-express-handlebars');
 	var transporter = nodemailer.createTransport({ 
 		host: 'server206.web-hosting.com', 
@@ -23,8 +22,8 @@ transporter.use('compile', hbs({ viewPath: './views/mail', extName: '.hbs' }));
   		subject: 'A New Set of Registration Pins',
 		template: 'pin',
   		context: {
-  			pin: pind,
-  			serial: serial
+  			pin: pinn,
+  			serial: str
   		}
 	}
 	
