@@ -6,7 +6,7 @@ exports.restmatrix = function restmatrix(x, res){
 		if( err ) throw err;
 		db.query('SELECT parent.sponsor, parent.user FROM user_tree AS node, user_tree AS parent WHERE node.lft BETWEEN parent.lft AND parent.rgt AND node.user = ? AND parent.stage2 is not null ORDER BY parent.lft', [x], function(err, results, fields){
 			if( err ) throw err;
-			var last2 = results.slice( -1 )[0];
+			var last2 = results.slice( -2 )[0];
 			var s2user = last2.user;
 			var s2spon = last2.sponsor;
 			db.query('SELECT * FROM stage2_tree WHERE user = ?', [s2user], function(err, results, fields){

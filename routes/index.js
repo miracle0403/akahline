@@ -29,7 +29,7 @@ var pool  = mysql.createPool({
   waitForConnections: true,
   host: "localhost",
   user: "root",
-  password: 'Akahlineglobal',
+  //password: 'Akahlineglobal',
   database: "new"
 });
 
@@ -380,7 +380,7 @@ router.get('/dashboard', authentificationMiddleware(), function(req, res, next) 
 											var total = cash + gift;
 											if( stage.feeder !== null  && stage.stage1 === null){
 												var currentstage = 'Feeder Stage';
-												console.log(currentstage);
+												console.log(currentstage); 
 												res.render( 'dashboard', {title: 'USER DASHBOARD', balance: balance, feedertree: feeder, stage1tree: stage1, stage2tree: stage2, stage3tree: stage3, stage4tree: stage4, gift: gift, total: total, cash: cash, car: earnings.car, salary: earnings.salary, empower: earnings.empower, leadership: earnings.leadership, laptop: earnings.laptop, phone: earnings.phone, powerbank: earnings.powerbank, stage4: earnings.stage4, stage3: earnings.stage3, stage2: earnings.stage2, stage: currentstage,  stage1: earnings.stage1, feeder: earnings.feeder });		
 	}									
 												if( stage.stage1 !== null  && stage.stage2 === null){

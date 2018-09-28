@@ -1,9 +1,9 @@
 DELIMITER //
 CREATE PROCEDURE feederAmount (user VARCHAR(255))
 BEGIN
-INSERT INTO earnings (user, feeder, stage1, stage2, stage3, stage4, car, powerbank, phone, salary, laptop, empower, leadership) VALUES (user, 6000, 0, 0,0,0,0,0,0,0,0,0,0);
+INSERT INTO earnings (user, feeder, stage1, stage2, stage3, stage4, car, powerbank, phone, salary, laptop, empower, leadership) VALUES (user, 4000, 0, 0,0,0,0,0,0,0,0,0,0);
 
-INSERT INTO transactions (user, credit, balance_bf, description, balance) VALUES (user, 6000, 0, 'feeder cash', 6000);
+INSERT INTO transactions (user, credit, balance_bf, description, balance) VALUES (user, 4000, 0, 'feeder cash', 6000);
 
 END //
 DELIMITER ;
@@ -33,11 +33,12 @@ ENGINE=InnoDB
 DELIMITER //
 CREATE PROCEDURE stage1Amount (user VARCHAR(255))
 BEGIN
-UPDATE earnings SET powerbank = 4000, amount = amount + 50000 WHERE user = user;
+UPDATE earnings SET powerbank = 4000, amount = amount + 40000 WHERE user = user;
 
-INSERT INTO transactions (user, credit, description) VALUES (user, 50000, 'stage1 cash' );
 
-INSERT INTO transactions (user, credit, description) VALUES (user, 4000, 'powerbank' );
+INSERT INTO transactions (user, balance_bf, balance, credit, description) VALUES (user, balance, balance + 40000, 40000, 'stage1 cash' );
+
+INSERT INTO transactions (user, balance_bf, balance, credit, description) VALUES (user, balance, balance + 40000, 4000, 'powerbank' );
 
 
 END //
