@@ -1,8 +1,8 @@
 var db = require( '../db.js' );
 var stage3func = require( './stage3.js' );
 var stage2func = require( './stage2spill.js' );
-exports.restmatrix = function restmatrix(x, res){
-	db.query('CALL stage1Amount (?)', [x], function(err, results, fields){
+exports.restmatrix = function restmatrix(x, res, balance){
+	db.query('CALL stage1Amount (?,?)', [x, balance], function(err, results, fields){
 		if( err ) throw err;
 		db.query('SELECT parent.sponsor, parent.user FROM user_tree AS node, user_tree AS parent WHERE node.lft BETWEEN parent.lft AND parent.rgt AND node.user = ? AND parent.stage2 is not null ORDER BY parent.lft', [x], function(err, results, fields){
 			if( err ) throw err;

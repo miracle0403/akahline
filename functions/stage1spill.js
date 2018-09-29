@@ -185,8 +185,13 @@ exports.stage1spill = function stage1spill( x, y, u, res){
 										if(user.ba !== null && user.bb !== null && user.bc !== null && user.bd !== null && user.aa !== null && user.ab !== null && user.ac !== null && user.ad !== null && user.ca !== null && user.cb !== null && user.cc !== null && user.cd !== null && user.da !== null && user.db !== null && user.dc !== null && user.dd !== null){
 										db.query('Update user_tree set stage2 = ? WHERE user = ?', ['yes', x], function(err, results, fields){
 							if (err) throw err;
+							db.query('SELECT balance FROM transactions WHERE user = ?', [x], function(err, results, fields){
+                    				if( err ) throw err;
+                    				var las = results.slice(-1)[0];
+                    				var balance = las.balance;
 										//call function for stage 2 to 4
-										stage2func.restmatrix(x, res);
+										stage2func.restmatrix(x, res, balance);
+												});
 											});
 										}
 									});

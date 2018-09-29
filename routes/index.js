@@ -40,12 +40,14 @@ var pool  = mysql.createPool({
 router.get('/', function(req, res, next) {
   console.log(req.user)
   console.log(req.isAuthenticated())
-  
+ // console.log( req.session )
   res.render('index', { title: 'AKAHLINE GLOBAL SERVICES' });
 });
 
 // get join
 router.get('/howitworks',  function (req, res, next){
+
+//console.log( req.route.path )
   res.render('howitworks', {title: "HOW IT WORKS"});
 });
 
@@ -104,7 +106,36 @@ router.get('/reset/:username/:email/:password/:code',  function (req, res, next)
 	  }
 	});
 });
-
+function restrict(x, y, res){
+	var currentUser = x
+	//the db query
+	db.query( 'SELECT user FROM admin WHERE user  = ?', [currentUser], function ( err, results, fields ){ 
+		if( err ) throw err;
+		if( results.length === 0 ){
+		console.log( 'user not an admin' )
+			res.redirect( 'dashboard' )
+		}
+		else{
+			var route = y;
+			console.log( route )
+			//res.redirect( route )
+			//return currentUser;
+		}
+	});
+}
+function admini(x){
+	db.query( 'SELECT user FROM admin WHERE user  = ?', [x], function ( err, results, fields ){ 
+		if( err ) throw err;
+		if( results.length === 0 ){
+			console.log( 'not admin' );
+		}
+		else{
+			var admin = x;
+			return admin;
+		}
+	});
+}
+//var admin = admini( )
 //var vtimer  = timer.timerreset( )
 //setInterval( 10000, vtimer ); 
 // get password verify
@@ -122,6 +153,7 @@ router.get('/manage', authentificationMiddleware(), function (req, res, next){
 				res.redirect( 'dashboard' )
 			}
 			else{
+			var admin = currentUser;
 				//check number of admins
 				db.query( 'SELECT COUNT(*) AS amount FROM admin ', function ( err, results, fields ){ 
 					if( err ) throw err;
@@ -160,7 +192,7 @@ router.get('/manage', authentificationMiddleware(), function (req, res, next){
 													if( err ) throw err;
 													var paidnumber = results[0].amount;
 													//check paid
-						res.render( 'manage', {title: 'MANAGE USERS', gift: gift, cash: cash, total: total, number: number, pending: pnumber, car: earnings.car, paid: paidnumber, salary: earnings.salary, empower: earnings.empower, leadership: earnings.leadership, laptop: earnings.laptop, phone: earnings.phone, powerbank: earnings.powerbank, stage4: earnings.stage4, stage3: earnings.stage3, stage2: earnings.stage2,  stage1: earnings.stage1, feeder: earnings.feeder, amount: amount});
+						res.render( 'manage', {title: 'MANAGE USERS', gift: gift, cash: cash, total: total, number: number, pending: pnumber, car: earnings.car, paid: paidnumber, salary: earnings.salary, empower: earnings.empower, leadership: earnings.leadership,  laptop: earnings.laptop, phone: earnings.phone, powerbank: earnings.powerbank, stage4: earnings.stage4, stage3: earnings.stage3, stage2: earnings.stage2,  stage1: earnings.stage1, feeder: earnings.feeder, admin: admin, amount: amount});
 								});
 							});
 						});
@@ -182,7 +214,10 @@ router.get('/status', function (req, res, next) {
 });
 
 //all users
-router.get('/allusers', function (req, res, next) {
+router.get('/allusers', authentificationMiddleware(), function  (req, res, next) {
+		var currentUser = req.session.passport.user.user_id;
+		var route = req.route.path;
+		restrict( currentUser, route, res )
 	    db.query('SELECT * FROM user', function(err, results, fields){
     		 if (err) throw err;
     		 var user = results;
@@ -195,14 +230,18 @@ router.get('/allusers', function (req, res, next) {
 });
 
 //all pending payments
-router.get('/pending', function (req, res, next) {
+router.get('/pending', authentificationMiddleware(), function  (req, res, next) {
+		var currentUser = req.session.passport.user.user_id;
+		var route = req.route.path;
+		restrict( currentUser, route, res )
 	    db.query('SELECT * FROM withdraw WHERE status = ?', ['pending'], function(err, results, fields){
     		 if (err) throw err;
     		 var pending = results;
     		 db.query('SELECT * FROM withdraw WHERE status = ?', ['paid'], function(err, results, fields){
     		 	if (err) throw err;
     		 	var paid = results;
-  				res.render('pending', {title: 'PAYMENTS', pending: pending, paid: paid});
+    		 	var admin = 'for admin'
+  				res.render('pending', {title: 'PAYMENTS', admin: admin, pending: pending, paid: paid});
   			});
   });
 });
@@ -255,8 +294,12 @@ router.get('/login', function(req, res, next) {
 //get referrals
 router.get('/referrals', authentificationMiddleware(), function(req, res, next) {
   var currentUser = req.session.passport.user.user_id;
+  var admin = admini( currentUser )
   //get sponsor name from database to profile page
-  db.query('SELECT sponsor FROM user WHERE user_id = ?', [currentUser], function(err, results, fields){
+  db.query('SELECT full_name, code, username, phone FROM user WHERE user_id = ?', [currentUser], function(err, results, fields){
+    if (err) throw err;
+    if( results.length === 0 ){
+    	db.query('SELECT sponsor FROM user WHERE user_id = ?', [currentUser], function(err, results, fields){
     if (err) throw err;
     var sponsor = results[0].sponsor;
     db.query('SELECT username FROM user WHERE user_id = ?', [currentUser], function(err, results, fields){
@@ -269,10 +312,32 @@ router.get('/referrals', authentificationMiddleware(), function(req, res, next) 
       var register = reg + user;
       db.query('SELECT * FROM user WHERE sponsor = ?', [user], function(err, results, fields){
         if (err) throw err;
-        console.log(results)
-        res.render('referrals', { title: 'Referrals', register: register, referrals: results, sponsor: sponsor, link: link});
+        //console.log(results)
+        res.render('referrals', { title: 'Referrals', admin: admin, register: register, referrals: results, sponsor: sponsor, link: link});
       });
     });
+  });
+    }else{
+    	var admin = currentUser;
+    	db.query('SELECT sponsor FROM user WHERE user_id = ?', [currentUser], function(err, results, fields){
+    if (err) throw err;
+    var sponsor = results[0].sponsor;
+    db.query('SELECT username FROM user WHERE user_id = ?', [currentUser], function(err, results, fields){
+      if (err) throw err;
+      //get the referral link to home page
+      //var website = "localhost:3002/";
+      var user = results[0].username;
+      var reg = "/register/";
+      var link = user;
+      var register = reg + user;
+      db.query('SELECT * FROM user WHERE sponsor = ?', [user], function(err, results, fields){
+        if (err) throw err;
+        //console.log(results)
+        res.render('referrals', { title: 'Referrals', admin: admin, register: register, referrals: results, sponsor: sponsor, admin: admin, link: link});
+      });
+    });
+  });
+    }
   });
 });
  
@@ -286,9 +351,10 @@ router.get('/logout', function(req, res, next) {
 
 //get dashboard''
 router.get('/dashboard', authentificationMiddleware(), function(req, res, next) {
-//pinset( );
+	pinset( );
   var db = require('../db.js');
   var currentUser = req.session.passport.user.user_id;
+  admini( currentUser )
   db.query( 'SELECT username FROM user WHERE user_id = ?', [currentUser], function ( err, results, fields ){
   	if( err ) throw err;
   	var username = results[0].username; 
@@ -334,7 +400,10 @@ router.get('/dashboard', authentificationMiddleware(), function(req, res, next) 
 								db.query('SELECT node.user,   (COUNT(parent.user) - (sub_tree.depth + 1)) AS depth FROM stage4 AS node, stage4 AS parent, stage4 AS sub_parent, ( SELECT node.user, (COUNT(parent.user) - 1) AS depth FROM stage4 AS node, stage4 AS parent WHERE node.lft BETWEEN parent.lft AND parent.rgt AND node.user = ? GROUP BY node.user ORDER BY node.lft) AS sub_tree WHERE node.lft BETWEEN parent.lft AND parent.rgt AND node.lft BETWEEN sub_parent.lft AND sub_parent.rgt AND sub_parent.user  =  sub_tree.user GROUP BY node.user HAVING depth   =  ? ORDER BY depth', [username, 1], function(err, results, fields){
 									if (err) throw err; 
 									var stage4 = results;
-									db.query( 'SELECT * FROM earnings WHERE user = ?', [username], function ( err, results, fields ){
+									db.query( 'SELECT user FROM admin WHERE user = ?', [currentUser], function ( err, results, fields ){
+										if(err) throw err;
+										if( results.length ===0 ){
+										db.query( 'SELECT * FROM earnings WHERE user = ?', [username], function ( err, results, fields ){
 										if(err) throw err;
 										if( results.length === 0 && stage.feeder !== null  && stage.stage1 === null ){
 											var earnings = {
@@ -405,6 +474,85 @@ router.get('/dashboard', authentificationMiddleware(), function(req, res, next) 
 	}									
 																
 															
+										}
+									});
+										
+										}
+										else{
+											var admin = currentUser;
+											db.query( 'SELECT * FROM earnings WHERE user = ?', [username], function ( err, results, fields ){
+										if(err) throw err;
+										if( results.length === 0 && stage.feeder !== null  && stage.stage1 === null ){
+											var earnings = {
+												feeder: 0,
+												stage1: 0,
+												stage2: 0,
+												stage3: 0,
+												stage4: 0,
+												powerbank: 0,
+												phone: 0,
+												laptop: 0,
+												leadership: 0,
+												empower: 0,
+												salary: 0,
+												car: 0
+											}
+											var cash = 0;
+											var gift = 0;
+											var total = cash + gift;
+											var error = 'You have not earned yet.'
+											var currentstage = 'Feeder Stage';
+											res.render( 'dashboard', {title: 'USER DASHBOARD', feedertree: feeder, error: error,  stage1tree: stage1, stage2: stage2, stage3: stage3, stage4: stage4, gift: gift, balance: balance, total: total, cash: cash, car: earnings.car, salary: earnings.salary, empower: earnings.empower, leadership: earnings.leadership, laptop: earnings.laptop, phone: earnings.phone, powerbank: earnings.powerbank, admin: admin, stage4: earnings.stage4, stage3: earnings.stage3, stage2: earnings.stage2, stage: currentstage,  stage1: earnings.stage1, feeder: earnings.feeder });		
+										}else{
+											
+											var earnings = {
+												feeder: results[0].feeder, 
+												stage1: results[0].stage1,
+												stage2: results[0].stage2,
+												stage3: results[0].stage3,
+												stage4: results[0].stage4,
+												powerbank: results[0].powerbank,
+												phone: results[0].phone,
+												laptop: results[0].laptop,
+												leadership: results[0].leadership,
+												empower: results[0].empower,
+												salary: results[0].salary,
+												car: results[0].car
+											}
+											//console.log('the earnings')
+											//console.log(results)
+											var gift = earnings.salary + earnings.powerbank + earnings.phone + earnings.car + earnings.laptop + earnings.empower + earnings.leadership;
+											var cash  = earnings.feeder + earnings.stage1 + earnings.stage2 + earnings.stage3 + earnings.stage4;
+											var total = cash + gift;
+											if( stage.feeder !== null  && stage.stage1 === null){
+												var currentstage = 'Feeder Stage';
+												console.log(currentstage); 
+												res.render( 'dashboard', {title: 'USER DASHBOARD', balance: balance, admin: admin, feedertree: feeder, stage1tree: stage1, stage2tree: stage2, stage3tree: stage3, stage4tree: stage4, gift: gift, total: total, cash: cash, car: earnings.car, salary: earnings.salary, empower: earnings.empower, leadership: earnings.leadership, laptop: earnings.laptop, phone: earnings.phone, powerbank: earnings.powerbank, stage4: earnings.stage4, stage3: earnings.stage3, stage2: earnings.stage2, stage: currentstage,  stage1: earnings.stage1, feeder: earnings.feeder });		
+	}									
+												if( stage.stage1 !== null  && stage.stage2 === null){
+													var currentstage = ' Stage One';
+													console.log(currentstage);
+													res.render( 'dashboard', {title: 'USER DASHBOARD', feedertree: feeder, balance: balance, stage1tree: stage1, stage2tree: stage2, stage3tree: stage3, stage4tree: stage4, gift: gift, total: total, cash: cash, car: earnings.car, salary: earnings.salary, empower: earnings.empower, admin: admin, balance: balance, leadership: earnings.leadership, laptop: earnings.laptop, phone: earnings.phone, powerbank: earnings.powerbank, stage4: earnings.stage4, stage3: earnings.stage3, stage2: earnings.stage2, stage: currentstage,  stage1: earnings.stage1, feeder: earnings.feeder });		
+										
+	}												if( stage.stage2 !==  null && stage.stage3 === null){
+														var currentstage = ' Stage Two';
+														console.log(currentstage);
+														res.render( 'dashboard', {title: 'USER DASHBOARD', feeder: feeder, stage1: stage1, stage2: stage2, stage3: stage3, stage4: stage4, gift: gift, total: total, cash: cash, car: earnings.car, admin: admin, balance: balance, salary: earnings.salary, empower: earnings.empower, leadership: earnings.leadership, laptop: earnings.laptop, phone: earnings.phone, powerbank: earnings.powerbank, stage4: earnings.stage4, stage3: earnings.stage3, stage2: earnings.stage2, stage: currentstage,  stage1: earnings.stage1, feeder: earnings.feeder });		
+}										
+														if( stage.stage3 !== null  && stage.stage4 === null){
+															var currentstage = ' Stage Three';
+															res.render( 'dashboard', {title: 'USER DASHBOARD', feeder: feeder, stage1: stage1, stage2: stage2, stage3: stage3, stage4: stage4, gift: gift, total: total, cash: cash, car: earnings.car, admin: admin, balance: balance, salary: earnings.salary, empower: earnings.empower, leadership: earnings.leadership, laptop: earnings.laptop, phone: earnings.phone, powerbank: earnings.powerbank, stage4: earnings.stage4, stage3: earnings.stage3, stage2: earnings.stage2, stage: currentstage,  stage1: earnings.stage1, feeder: earnings.feeder });		
+		}								
+															//console.log(currentstage);
+															if( stage.stage4 !== null){
+																var currentstage = ' Stage Four';
+																console.log(currentstage);
+																res.render( 'dashboard', {title: 'USER DASHBOARD', feeder: feeder, stage1: stage1, stage2: stage2, stage3: stage3, stage4: stage4, gift: gift, total: total, cash: cash, car: earnings.car, admin: admin, balance: balance, salary: earnings.salary, empower: earnings.empower, leadership: earnings.leadership, laptop: earnings.laptop, phone: earnings.phone, powerbank: earnings.powerbank, stage4: earnings.stage4, stage3: earnings.stage3, stage2: earnings.stage2, stage: currentstage,  stage1: earnings.stage1, feeder: earnings.feeder });		
+	}									
+																
+															
+										}
+									});
 										}
 									});
 								});
@@ -494,10 +642,13 @@ router.post('/addadmin', function (req, res, next) {
 //get profile
 router.get('/profile', authentificationMiddleware(), function(req, res, next) {
   var currentUser = req.session.passport.user.user_id;
-  //get user details to showcase
-  db.query('SELECT full_name, code, username, phone FROM user WHERE user_id = ?', [currentUser], function(err, results, fields){
+  
+ db.query('SELECT user FROM admin WHERE user = ?', [currentUser], function(err, results, fields){
     if (err) throw err;
-    console.log(results)
+    if( results.length === 0 ){
+    	db.query('SELECT full_name, code, username, phone FROM user WHERE user_id = ?', [currentUser], function(err, results, fields){
+    if (err) throw err;
+    //console.log(results)
     var bio = {
    	 	fullname: results[0].full_name,
     	code: results[0].code,
@@ -507,7 +658,7 @@ router.get('/profile', authentificationMiddleware(), function(req, res, next) {
     //get from profile table
     db.query('SELECT * FROM profile WHERE user = ?', [bio.username], function(err, results, fields){
       if (err) throw err;
-      console.log(results)
+      //console.log(results)
       if ( results.length === 0 ){
       		var error = "You have not updated your profile yet."
       		res.render('profile', {title: 'PROFILE', error: error,  phone: bio.phone, code: bio.code, fullname: bio.fullname});
@@ -521,6 +672,38 @@ router.get('/profile', authentificationMiddleware(), function(req, res, next) {
       res.render('profile', {title: 'PROFILE', bank: prof.bank, accountname: prof.account_name, accountnumber: prof.account_number, phone: bio.phone, code: bio.code, fullname: bio.fullname});
       }
     });
+  });
+    }else{
+    	var admin = currentUser;
+    	db.query('SELECT full_name, code, username, phone FROM user WHERE user_id = ?', [currentUser], function(err, results, fields){
+    if (err) throw err;
+    //console.log(results)
+    var bio = {
+   	 	fullname: results[0].full_name,
+    	code: results[0].code,
+    	phone: results[0].phone,
+    	username: results[0].username
+    }
+    //get from profile table
+    db.query('SELECT * FROM profile WHERE user = ?', [bio.username], function(err, results, fields){
+      if (err) throw err;
+      //console.log(results)
+      if ( results.length === 0 ){
+      		var error = "You have not updated your profile yet."
+      		res.render('profile', {title: 'PROFILE', error: error,  phone: bio.phone, code: bio.code, fullname: bio.fullname});
+      }else{
+      		var prof = {
+      		bank: results[0].bank,
+      		bank: results[0].account_name,
+      		bankname: results[0].account_name,
+      		account_number: results[0].account_number
+      }
+      res.render('profile', {title: 'PROFILE', bank: prof.bank, accountname: prof.account_name, accountnumber: prof.account_number, phone: bio.phone, admin: admin, code: bio.code, fullname: bio.fullname});
+      }
+    });
+  });
+    }
+  //get user details to showcase
   });
 });
 
@@ -687,7 +870,10 @@ router.post('/reset', function(req, res, next) {
     });
 });
 
-router.post('/search', function(req, res, next) {
+router.post('/search', authentificationMiddleware(), function  (req, res, next) {
+		var currentUser = req.session.passport.user.user_id;
+		var route = req.route.path;
+		restrict( currentUser, route, res )
 	var username = req.body.username;
 	db.query('SELECT * FROM user WHERE username = ?', [username], function(err, results, fields){
 		if ( err ) throw err;
