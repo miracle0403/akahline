@@ -2,7 +2,7 @@ var db = require( '../db.js' );
 var stage3func = require( './stage3.js' );
 var stage2func = require( './stage2spill.js' );
 exports.restmatrix = function restmatrix(x, res, balance){
-	db.query('CALL stage1Amount (?,?)', [x, balance], function(err, results, fields){
+	db.query('CALL stage2Amount (?,?)', [x, balance], function(err, results, fields){
 		if( err ) throw err;
 		db.query('SELECT parent.sponsor, parent.user FROM user_tree AS node, user_tree AS parent WHERE node.lft BETWEEN parent.lft AND parent.rgt AND node.user = ? AND parent.stage2 is not null ORDER BY parent.lft', [x], function(err, results, fields){
 			if( err ) throw err;
@@ -50,6 +50,8 @@ exports.restmatrix = function restmatrix(x, res, balance){
 				if(stage2.a !== null && stage2.b !== null && stage2.c !== null && stage2.d === null){
 					db.query('UPDATE stage2_tree SET d = ? WHERE user = ?', [x, s2user], function(err, results, fields){
 						if(err) throw err;
+						db.query('UPDATE user_tree SET stage3 = ? WHERE user = ?', ['yes', s2user], function(err, results, fields){
+						if(err) throw err;
 						db.query('CALL stage2Amount(?)', [s2user], function(err, results, fields){
 							if (err) throw err;
 							db.query('CALL stage2try(?,?,?)', [s2user, s2user, x], function(err, results, fields){
@@ -58,24 +60,14 @@ exports.restmatrix = function restmatrix(x, res, balance){
 							 });
 						});
 					});
+				});
 				}
 				if(stage2.a !== null && stage2.b !== null && stage2.c !== null && stage2.d === null){
 					//call function for stage 2 spill
-					stage2.stage2spill( x );
+					stage2.stage2spill( x, s2user, s2spon, res );
 				}
-				db.query('SELECT * FROM stage2_tree WHERE stage2 = ?', [x], function(err, results, fields){
-					if (err) throw err;
-					var user2  = {
-						a: results[0].a,
-						b: results[0].b,
-						c: results[0].c,
-						d: results[0].d
-					}
-					if(user2.a !== null && user2.b !== null && user2.c !== null && user2.d !== null){
-						stage3func.stage3(x,res);
-					}
+				
 				});
 			});
 		});
-	});
-}
+	}

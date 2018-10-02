@@ -25,7 +25,7 @@ const saltRounds = bcrypt.genSalt( 10, rounds);
 
 var pool  = mysql.createPool({
   connectionLimit : 100,
-  multipleStatements: true,
+  multipleStatements: true, 
   waitForConnections: true,
   host: "localhost",
   user: "root",
@@ -33,15 +33,17 @@ var pool  = mysql.createPool({
   database: "new"
 });
 
-
+//
+//console.log( days )
+//console.log( now )
 //var admin = admin( );
 //console.log( admin )
 /* GET home page. */
 router.get('/', function(req, res, next) {
-  console.log(req.user)
-  console.log(req.isAuthenticated())
- // console.log( req.session )
-  res.render('index', { title: 'AKAHLINE GLOBAL SERVICES' });
+  console.log(req.user);
+  
+ 	res.render('index', { title: 'AKAHLINE GLOBAL SERVICES' });		
+
 });
 
 // get join
@@ -750,7 +752,7 @@ passport.deserializeUser(function(user_id, done){
   done(null, user_id)
 });
 
-pinset( )
+//pinset( )
 //get function for pin and serial number
 function pinset(){
 var maiyl = require( '../nodemailer/pin.js' );
@@ -1038,7 +1040,7 @@ router.post('/register', function (req, res, next) {
   var errors = req.validationErrors();
 	if (errors) { 
   	  console.log(JSON.stringify(errors));
-  	  res.render('register', { title: 'REGISTRATION FAILED', errors: errors});
+  	  res.render('register', { title: 'REGISTRATION FAILED', errors: errors, username: username, email: email, phone: phone, password: password, cpass: cpass, fullname: fullname, code: code, pin: pin, serial: serial, sponsor: sponsor});
   }else{
   	var username = req.body.username;
     var password = req.body.pass1;
@@ -1059,14 +1061,14 @@ router.post('/register', function (req, res, next) {
         var error = "This Sponsor does not exist";
         //req.flash( 'error', error)
         console.log(error);
-        res.render('register', {title: "REGISTRATION FAILED", error: error });
+        res.render('register', {title: "REGISTRATION FAILED", error: error, username: username, email: email, phone: phone, password: password, cpass: cpass, fullname: fullname, code: code, pin: pin, serial: serial, sponsor: sponsor});
       }else{
       		db.query('SELECT username FROM user WHERE username = ?', [username], function(err, results, fields){
           	if (err) throw err;
           	if(results.length===1){
           		var error = "Sorry, this username is taken";
             		console.log(error);
-            		res.render('register', {title: "REGISTRATION FAILED", error: error });
+            		res.render('register', {title: "REGISTRATION FAILED", error: error, username: username, email: email, phone: phone, password: password, cpass: cpass, fullname: fullname, code: code, pin: pin, serial: serial, sponsor: sponsor});
           	}else{
           		db.query('SELECT email FROM user WHERE email = ?', [email], function(err, results, fields){
           			if (err) throw err;
@@ -1078,25 +1080,25 @@ router.post('/register', function (req, res, next) {
           					if (err) throw err;
           					if(results.length === 0){
       								var error = 'serial does not exist';
-      								res.render('register', {error: error, title: 'REGISTRATION UNSUCCESSFUL!'})
+      								res.render('register', {error: error, username: username, email: email, phone: phone, password: password, cpass: cpass, fullname: fullname, code: code, pin: pin, serial: serial, sponsor: sponsor, title: 'REGISTRATION UNSUCCESSFUL!'})
     							}else{
     								const hash = results[0].pin;
     								bcrypt.compare(pin, hash, function(err, response){
     									if(response === false){
           								var error = 'the pin does not exist';
-          								res.render('register', {title: 'REGISTRATION UNSUSSESSFUL!', error: error})
+          								res.render('register', {title: 'REGISTRATION UNSUSSESSFUL!', error: error, username: username, email: email, phone: phone, password: password, cpass: cpass, fullname: fullname, code: code, pin: pin, serial: serial, sponsor: sponsor})
           							}else{
           								var user_pin = results[0].user;
           								console.log('user in the pin is' + user_pin);
           								if(user_pin !== null){
             								var error = 'pin has been  used already!'
-            								res.render('register', {title: 'REGISTRATION UNSUSSESSFUL!', error: error});
+            								res.render('register', {title: 'REGISTRATION UNSUSSESSFUL!', error: error, username: username, email: email, phone: phone, password: password, cpass: cpass, fullname: fullname, code: code, pin: pin, serial: serial, sponsor: sponsor});
             								}else{
             									db.query('SELECT user FROM pin WHERE user = ?', [username], function(err, results, fields){
            		 								if (err) throw err;
            		 								if(results.length  >= 1){
            		 									var error = "Sorry, You cannot Join the Matrix because you are already in the matrix";
-           		 								res.render('register', {title: 'REGISTRATION UNSUSSESSFUL!', error: error});
+           		 								res.render('register', {title: 'REGISTRATION UNSUSSESSFUL!', error: error, username: username, email: email, phone: phone, password: password, cpass: cpass, fullname: fullname, code: code, pin: pin, serial: serial, sponsor: sponsor});
            		 								}else{
            		 									bcrypt.hash(password, saltRounds, null, function(err, hash){
            		 										db.query( 'CALL register(?, ?, ?, ?, ?, ?, ?, ?, ?)', [sponsor, fullname, phone, code, username, email, hash, 'active', 'no'], function(err, result, fields){

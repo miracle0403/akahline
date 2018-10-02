@@ -5,12 +5,12 @@ exports.sendmail= function sendmail(x, y, z){
 	//console.log( trysend );
 	var hbs = require('nodemailer-express-handlebars');
 	var transporter = nodemailer.createTransport({ 
-		host: 'server206.web-hosting.com', 
-		port: 26, 
+		host: 'server1.akahlineglobalservices.com', 
+		port: 587, 
 		secure: false, // true for 465, false for other ports
 		auth: { 
-			user: 'noreply@swiftcircle.website', // generated ethereal 
-			pass:  'Miracle1994' // generated ethereal password } }); 
+			user: 'admin@akahlineglobalservices.com', // generated ethereal 
+			pass:  'Akahlineglobal' // generated ethereal password } }); 
 		  }
     });
 transporter.use('compile', hbs({ viewPath: './views/mail', extName: '.hbs' })); 
