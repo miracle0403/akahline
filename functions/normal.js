@@ -7,7 +7,7 @@ exports.normal = function normal(x, res){
 	var last = results.slice(-1)[0];
     var user = last.user;
     var y = last.sponsor;
-    console.log(last);
+    //console.log(last);
     	db.query ('SELECT * FROM feeder_tree WHERE user = ?', [user], function(err, results, fields){
 	 		if (err) throw err;
 	 		if (results.length === 1){
@@ -35,7 +35,7 @@ exports.normal = function normal(x, res){
 						});
 					}); 
 				 }
-				 if(first.a !== null && first.b !== null && first.c === null && first.d === null){
+				 if(first.a !== null && first.b !== null && first.c === null && first.d == null){
 				 	db.query('UPDATE feeder_tree SET c = ? WHERE user = ?', [x, user], function(err, results, fields){
 						if(err) throw err;
 						db.query('CALL leafadd(?,?,?)', [y, user, x], function(err, results, fields){

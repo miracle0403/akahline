@@ -54,15 +54,11 @@ never share your email with anyone else.</small>
 	<div class="form-row">
     <div class="form-group col-md-6">
     <label for="countrycode">Country Code</label>
-  <select name="code" class="form-control" value="Select Country Code" id="code">
-    <option></option>
-      <option>+234</option>
-  </select>
+  <input type="tel" class="form-control" id="code" name ="code" placeholder="e.g +234" value="234"  required />
 </div>
     <div class="form-group col-md-6">
     <label for="phone">Phone Number</label>
-  <input type="tel" class="form-control" 
-id="phone" name ="phone" placeholder="e.g 8012345678" value="{{phone}}"  required />
+  <input type="tel" class="form-control" id="phone" name ="phone" placeholder="e.g 8012345678" value="{{phone}}"  required />
 </div>
 	</div>
 	<div class="form-row">
@@ -97,7 +93,7 @@ id="sponsor" name ="serial" value="{{serial}}"  placeholder =" Eter your Serial 
       </label>
     </div>
   </div><br><br>
- <!--   <button type="submit" id="registerbutton" class="btn btn-primary">Register</button><hr> -->
+  <button type="submit" id="registerbutton" class="btn btn-primary">Register</button><hr> 
  </div>
 </form>
 

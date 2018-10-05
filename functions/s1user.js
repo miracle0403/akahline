@@ -5,13 +5,17 @@ var fillup = require( './withsponsor.js' );
 exports.s1user = function(x, res){
 		db.query('SELECT parent.sponsor, parent.user FROM user_tree AS node, user_tree AS parent WHERE node.lft BETWEEN parent.lft AND parent.rgt AND node.user = ? AND parent.stage1 is not null ORDER BY parent.lft', [x], function(err, results, fields){
 			if( err ) throw err;
+			console.log(results)
 			var last1 = results.slice( -2 )[0];
 			var s1user = last1.user;
 			var s1spon = last1.sponsor;
-			db.query ('SELECT * FROM stage1_tree WHERE a = ? or b  = ? or c  = ? or d  = ?', [x, x, x, x], function(err, results, fields){
+			console.log(last1);
+			db.query ('SELECT * FROM stage1_tree WHERE a = ? or b  = ? or c  = ? or d  = ?', [s1user, s1user, s1user, s1user], function(err, results, fields){
 	 	if (err) throw err;
-		if (results.length === 1){
-	 		var stage1 = {
+		if (results.length === 0){
+			console.log('s2user has not entered a or b or c or d yet');
+		}else{
+	 		var user = {
 	 			user: results[0].user,
 			  	a: results[0].a,
 			  	b: results[0].b,
@@ -34,6 +38,7 @@ exports.s1user = function(x, res){
 			  	dc: results[0].c,
 			  	dd: results[0].d
 			 }
+			 console.log(user)
 			db.query('SELECT * FROM stage1_tree WHERE user = ?', [s1user], function(err, results, fields){
 				if (err) throw err;
 				var stage1  = {
