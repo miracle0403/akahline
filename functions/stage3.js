@@ -4,7 +4,7 @@ var stage4func = require( './stage4.js' );
 exports.stage3 = function stage3( x, res){
 	db.query('SELECT parent.sponsor, parent.user FROM user_tree AS node, user_tree AS parent WHERE node.lft BETWEEN parent.lft AND parent.rgt AND node.user = ? AND parent.stage3 is not null ORDER BY parent.lft', [x], function(err, results, fields){
 		if ( err ) throw err;
-		var last3 = results.slice( -1)[0];
+		var last3 = results.slice( -2)[0];
 		var s3user = last3.user;
 		var s3spon = last.sponsor;
 		db.query('SELECT * FROM stage3_tree WHERE user = ?', [s3user], function(err, results, fields){
@@ -68,20 +68,9 @@ exports.stage3 = function stage3( x, res){
 			}
 			if(stage3.a !== null && stage3.b !== null && stage3.c !== null && stage3.d !== null){
 				//call function for stage 3 spillover
-				stage3func.stage3spill( x );
+				stage3func.stage3spill( x, s3user, s3spon, res);
 			}
-			db.query('SELECT * FROM stage3_tree WHERE stage3 = ?', [x], function(err, results, fields){
-					if (err) throw err;
-					var user3  = {
-						a: results[0].a,
-						b: results[0].b,
-						c: results[0].c,
-						d: results[0].d
-					}
-					if(user3.a !== null && user3.b !== null && user3.c !== null && user3.d !== null){
-						stage3func.stage4(x, res);
-					}
-				});
+			
 		});
 	});
 }

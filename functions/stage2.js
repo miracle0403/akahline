@@ -62,7 +62,7 @@ exports.restmatrix = function restmatrix(x, res, balance){
 					});
 				});
 				}
-				if(stage2.a !== null && stage2.b !== null && stage2.c !== null && stage2.d === null){
+				if(stage2.a !== null && stage2.b !== null && stage2.c !== null && stage2.d !== null){
 					//call function for stage 2 spill
 					stage2.stage2spill( x, s2user, s2spon, res );
 				}
