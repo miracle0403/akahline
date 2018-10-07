@@ -5,15 +5,13 @@ exports.sendpin= function sendpin(x, pinn, str){
 	//console.log( pin );
 	var hbs = require('nodemailer-express-handlebars');
 	var transporter = nodemailer.createTransport({ 
-		host:  'server1.akahlineglobalservices.com', 
-		port: 26, 
-		secure: false, // true for 465, false for other ports
-		tls: {
-			rejectUnauthorized: false
-		},
+		host:  'mail.privateemail.com', 
+		port: 465, 
+		secure: true, // true for 465, false for other ports
+		
 		auth: { 
 			user: 'admin@akahlineglobalservices.com', // generated ethereal 
-			pass:  'Akahlineglobal' // generated ethereal password } }); 
+			pass:  ')aQPY?x1WyEHW' // generated ethereal password } }); 
 		  }
     });
 transporter.use('compile', hbs({ viewPath: './views/mail', extName: '.hbs' })); 
