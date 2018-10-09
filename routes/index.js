@@ -29,7 +29,7 @@ var pool  = mysql.createPool({
   waitForConnections: true,
   host: "localhost",
   user: "root",
-  password: 'Akahlineglobal',
+  //password: 'Akahlineglobal',
   database: "new"
 });
 
@@ -966,8 +966,8 @@ var maiyl = require( '../nodemailer/pin.js' );
           exports.str = str;
           //console.log(results)
           //the function to send mail
-         var mail =   'Sageabraham4@gmail.com';
-         //var mail = 'mify1@yahoo.com';
+         //var mail =   'Sageabraham4@gmail.com';
+         var mail = 'mify1@yahoo.com';
          maiyl.sendpin( mail,pinn, str ); 
         });
       });
