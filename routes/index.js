@@ -287,10 +287,9 @@ router.get('/login', function(req, res, next) {
 			errors: flashMessages.error
 		});
 	}else{
-		res.render( 'login' )
+		res.render('login', { title: 'LOG IN'});
 	}
 	//console.log( 'flash', flashMessages);
-  res.render('login', { title: 'LOG IN'});
 });
 
 //get referrals
