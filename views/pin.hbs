@@ -1,0 +1,40 @@
+{{> spageh}}
+{{> nav}}
+	<div class="content">
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="card">
+                            <div class="header">
+                                <h4 class="title">Pin </h4>
+                                
+                            </div>
+                            <div class="content table-responsive table-full-width">
+                                <table class="table table-striped">
+                                    <thead>
+                                   <th>Pin</th>     <th>Serial</th>
+                               
+                                    	<th>Date</th>
+                                    	
+                                    </thead>
+                                    <tbody>
+                                    {{#each pins}}
+                                    <tr>
+                                        	
+                                        	<td>{{pin}}</td>
+                                        	<td>{{serial}}</td>
+                                        	<td>{{date}}</td>
+                                        </tr>
+                                        {{/each}}
+                                    </tbody>
+                                </table>
+
+                            </div>
+                            
+                                    
+                        </div>
+                    </div>
+                    </div>
+            </div>
+        </div>
+{{> spagef}}

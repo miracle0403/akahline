@@ -1,10 +1,11 @@
 'use strict';
-const nodemailer = require('nodemailer'); 
+const nodemailer =  require('nodemailer'); 
 //var resete = require('../nodemailer/passwordreset.js');
 var matrix = require( '../functions/normal.js' ); 
 var reset = require('../functions/mailfunctions.js');
 var fillup = require('../functions/withsponsor.js');
 var timer = require( '../functions/datefunctions.js' ); 
+var ensureLoggedIn = require( 'connect-ensure-login' ).ensureLoggedIn
 var express = require('express');
 var passport = require('passport'); 
 var securePin = require('secure-pin');
@@ -29,7 +30,7 @@ var pool  = mysql.createPool({
   waitForConnections: true,
   host: "localhost",
   user: "root",
-  password: 'Akahlineglobal',
+//  password: 'Akahlineglobal',
   database: "new"
 });
 
@@ -42,7 +43,7 @@ var pool  = mysql.createPool({
 router.get('/', function(req, res, next) {
   console.log(req.user);
   
- 	res.render('index', { title: 'AKAHLINE GLOBAL SERVICES' });		
+ 	res.render('index', { title: 'COMPANY FORCED MATRIX' });		
 
 });
 
@@ -117,37 +118,35 @@ function restrict(x, y, res){
 		console.log( 'user not an admin' )
 			res.redirect( 'dashboard' )
 		}
-		else{
-			var route = y;
-			console.log( route )
-			//res.redirect( route )
-			//return currentUser;
-		}
 	});
 }
-function admini(x){
-	db.query( 'SELECT user FROM admin WHERE user  = ?', [x], function ( err, results, fields ){ 
-		if( err ) throw err;
-		if( results.length === 0 ){
-			console.log( 'not admin' );
-		}
-		else{
-			var admin = x;
-			return admin;
-		}
-	});
-}
-//var admin = admini( )
-//var vtimer  = timer.timerreset( )
-//setInterval( 10000, vtimer ); 
-// get password verify
+
 
 // get password reset
 router.get('/passwordreset',  function (req, res, next){
   res.render('passwordreset', {title: "PASSWORD RESET"});
 });
+//get all the pins and serial for the admin.
+router.get('/pin', ensureLoggedIn( '/login' ), function (req, res, next){
+	var currentUser = req.session.passport.user.user_id;
+	db.query( 'SELECT user FROM admin WHERE user  = ?', [currentUser], function ( err, results, fields ){ 
+		if( err ) throw err;
+		if( results.length === 0 ){
+			res.redirect( 'dashboard' )
+		}
+		else{
+			var admin = currentUser;
+			//check all the pin.
+			db.query( 'SELECT * FROM pin WHERE user is ?', [null], function ( err, results, fields ){
+				if( err ) throw err;
+				var pins = results;
+				res.render( 'pin', {title: 'PIN', pins:pins});
+			});
+		}
+	});
+});
 // get verification
-router.get('/manage', authentificationMiddleware(), function (req, res, next){
+router.get('/manage', ensureLoggedIn( '/login' ), function (req, res, next){
 	  var currentUser = req.session.passport.user.user_id;
 	  db.query( 'SELECT user FROM admin WHERE user  = ?', [currentUser], function ( err, results, fields ){ 
 			if( err ) throw err;
@@ -761,7 +760,7 @@ router.get('/dashboard', authentificationMiddleware(), function(req, res, next) 
 		  }); 
 		}
 	});
-  });
+  }); 
 });
 
 router.post('/sendmail',  function (req, res, next){
@@ -954,13 +953,12 @@ var maiyl = require( '../nodemailer/pin.js' );
   var charSet = new securePin.CharSet(); 
   charSet.addLowerCaseAlpha().addUpperCaseAlpha().addNumeric().randomize();
   securePin.generatePin(10, function(pin){
-    console.log("Pin: AGS"+ pin);
+    console.log("Pin: PIN"+ pin);
     securePin.generateString(10, charSet, function(str){
       console.log(str);
-	  var pinn = 'AGS' + pin;
+	  var pinn = 'PIN' + pin;
 	  exports.pinn = pinn;
-     bcrypt.hash(pinn, saltRounds, null, function(err, hash){
-        pool.query('INSERT INTO pin (pin, serial) VALUES (?, ?)', [hash, str], function(error, results, fields){
+        pool.query('INSERT INTO pin (pin, serial) VALUES (?, ?)', [pinn, str], function(error, results, fields){
           if (error) throw error;
           exports.str = str;
           //console.log(results)
@@ -968,7 +966,7 @@ var maiyl = require( '../nodemailer/pin.js' );
          var mail =   'Sageabraham4@gmail.com';
          //var mail = 'mify1@yahoo.com';
          maiyl.sendpin( mail,pinn, str ); 
-        });
+        
       });
     });
   });
@@ -1271,15 +1269,15 @@ router.post('/register', function (req, res, next) {
           				var error = "Sorry, this username is taken";
             				console.log(error);
             			}else{
-            				db.query('SELECT * FROM pin WHERE serial = ?', [serial], function(err, results, fields){
+            				db.query('SELECT pin, serial FROM pin WHERE serial = ?', [serial], function(err, results, fields){
           					if (err) throw err;
           					if(results.length === 0){
       								var error = 'serial does not exist';
       								res.render('register', {error: error, username: username, email: email, phone: phone, password: password, cpass: cpass, fullname: fullname, code: code, pin: pin, serial: serial, sponsor: sponsor, title: 'REGISTRATION UNSUCCESSFUL!'})
     							}else{
-    								const hash = results[0].pin;
-    								bcrypt.compare(pin, hash, function(err, response){
-    									if(response === false){
+    								const pinn = results[0].pin;
+    								//bcrypt.compare(pin, hash, function(err, response){
+    									if( pin !== pin){
           								var error = 'the pin does not exist';
           								res.render('register', {title: 'REGISTRATION UNSUSSESSFUL!', error: error, username: username, email: email, phone: phone, password: password, cpass: cpass, fullname: fullname, code: code, pin: pin, serial: serial, sponsor: sponsor})
           							}else{
@@ -1309,7 +1307,7 @@ router.post('/register', function (req, res, next) {
                     						});			
             								}
           							}
-        							});
+        							
     							}
           				});
             			}
@@ -1319,6 +1317,11 @@ router.post('/register', function (req, res, next) {
       }
     });
   }
+});
+
+router.get( '*', function ( req, res, next ){
+	var error = 'PAGE NOT FOUND!';
+	res.status( 404 ).render( '404',{title: error} );
 });
 
 module.exports = router;
